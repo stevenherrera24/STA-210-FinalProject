@@ -1,0 +1,34 @@
+---
+title: "What Makes the Best Tennis Player?"
+author: "Steven Herrera and Ethan Shen"
+date: "11/09/2018"
+output: html_document
+---
+
+```{r setup, message=F,include=F}
+knitr::opts_chunk$set(echo = TRUE)
+options(knitr.kable.NA = '')
+```
+
+# Introduction
+
+# Data
+
+# Analysis
+
+1) Description of the response variable and its variable type
+
+2) Description of the explanatory variables and the population coefficients you wish to understand using statistical inference
+
+3) Hypothesis/hypotheses regarding your question of interest
+
+4) Proposed methods to use for the analysis 
+
+# Reference
+
+
+
+
+
+
+
