@@ -12,9 +12,21 @@ options(knitr.kable.NA = '')
 
 # Introduction
 
+*** 
+
 # Data
 
+*** 
+
+We used the following data set: `atp_matches_2017`, created by JeffSackMann on GitHub. 
+
+Here is a link to the dataset: [2017 ATP Matches](https://github.com/JeffSackmann/tennis_atp/blob/master/atp_matches_2017.csv).
+
+
+
 # Analysis
+
+*** 
 
 1) Description of the response variable and its variable type
 
@@ -25,6 +37,12 @@ options(knitr.kable.NA = '')
 4) Proposed methods to use for the analysis 
 
 # Reference
+
+*** 
+
+# Additional Work
+
+*** 
 
 
 
