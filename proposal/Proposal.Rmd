@@ -67,7 +67,7 @@ atp1 <- atp %>%
 3) Because we are interested in winners, we will only look at the observations where the match was a **final**.
 
 ```{r}
-winners <- atp1 %>%
+winners2017 <- atp1 %>%
   filter(round == "F")
 ```
 
@@ -109,6 +109,14 @@ winners2011 <- atp2011 %>%
 winners2010 <- atp2010 %>%
   filter(tourney_date < 20101121) %>%
   filter(round == "F")
+```
+
+```{r}
+winners <- rbind(winners2017, winners2016, winners2015, winners2014, winners2013, winners2012, winners2011, winners2010)
+```
+
+```{r}
+glimpse(winners)
 ```
 
 
