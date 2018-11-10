@@ -54,7 +54,7 @@ possible explanatory variables: winner hand, winner age, winner rank, winner ran
 1) In order to obtain the dataset in our RMD, we will first need the data to fit nicely into a CSV file. In excel, we used the `Text to Columns` function, and inserted the file here:
 
 ```{r message=FALSE}
-atp <- read_csv("atp.csv")
+atp <- read_csv("files/atp.csv")
 ```
 
 2) There are a lot of things interesting about this dataset. The first thing that we did was filter for events that are normal tournament-style matches (not ATP Final events or Davis Cup, which both occur past November 13, 2017, coded as `20171113` in the dataset under the `tourney_name` variable).
@@ -67,9 +67,20 @@ atp1 <- atp %>%
 3) Because we are interested in winners, we will only look at the observations where the match was a **final**.
 
 ```{r}
-atp1 %>%
+winners <- atp1 %>%
   filter(round == "F")
 ```
 
+4) Because we are looking in the time period from 2010-2017, we will do the same thing for the rest of the years:
+
+```{r message=FALSE}
+atp2016 <- read_csv("files/atp2016.csv")
+atp2015 <- read_csv("files/atp2015.csv")
+atp2014 <- read_csv("files/atp2014.csv")
+atp2013 <- read_csv("files/atp2013.csv")
+atp2012 <- read_csv("files/atp2012.csv")
+atp2011 <- read_csv("files/atp2011.csv")
+atp2010 <- read_csv("files/atp2010.csv")
+```
 
 
