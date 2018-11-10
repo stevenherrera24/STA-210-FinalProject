@@ -113,6 +113,9 @@ hard <- winners %>%
          mean_w_bpSaved = mean(w_bpSaved),
          mean_w_bpFaced = mean(w_bpFaced),
          num = n())
+
+myvars <- names(hard) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name", "loser_hand", "loser_ht", "loser_ioc", "loser_age", "loser_rank", "loser_rank_points", "l_ace", "l_df", "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", "l_bpSaved", "l_bpFaced") 
+hard <- hard[!myvars]
 ``` 
 
 
@@ -140,6 +143,9 @@ clay <- winners %>%
          mean_w_bpSaved = mean(w_bpSaved),
          mean_w_bpFaced = mean(w_bpFaced),
          num = n())
+
+myvars <- names(clay) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name", "loser_hand", "loser_ht", "loser_ioc", "loser_age", "loser_rank", "loser_rank_points", "l_ace", "l_df", "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", "l_bpSaved", "l_bpFaced") 
+clay <- clay[!myvars]
 ```
 
 ```{r}
@@ -166,6 +172,9 @@ grass <- winners %>%
          mean_w_bpSaved = mean(w_bpSaved),
          mean_w_bpFaced = mean(w_bpFaced),
          num = n())
+
+myvars <- names(grass) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name", "loser_hand", "loser_ht", "loser_ioc", "loser_age", "loser_rank", "loser_rank_points", "l_ace", "l_df", "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", "l_bpSaved", "l_bpFaced") 
+grass <- grass[!myvars]
 ```
 
 Now we have three data sets, each one with the statistics of a player's performance on a specific surface. 
@@ -210,16 +219,6 @@ hard %>%
   count(winner_name) %>%
   arrange(desc(n))
 ```
-
-```{r}
-ggplot(data = clay, aes(x = mean_w_ace, y = winner_name)) + geom_boxplot()
-```
-
-
-
-
-
-
 
 
 
