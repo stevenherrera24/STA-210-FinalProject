@@ -111,7 +111,8 @@ hard <- winners %>%
          mean_w_2ndWon = mean(w_2ndWon),
          mean_w_SvGms = mean(w_SvGms),
          mean_w_bpSaved = mean(w_bpSaved),
-         mean_w_bpFaced = mean(w_bpFaced))
+         mean_w_bpFaced = mean(w_bpFaced),
+         num = n())
 ``` 
 
 
@@ -137,7 +138,8 @@ clay <- winners %>%
          mean_w_2ndWon = mean(w_2ndWon),
          mean_w_SvGms = mean(w_SvGms),
          mean_w_bpSaved = mean(w_bpSaved),
-         mean_w_bpFaced = mean(w_bpFaced))
+         mean_w_bpFaced = mean(w_bpFaced),
+         num = n())
 ```
 
 ```{r}
@@ -162,7 +164,8 @@ grass <- winners %>%
          mean_w_2ndWon = mean(w_2ndWon),
          mean_w_SvGms = mean(w_SvGms),
          mean_w_bpSaved = mean(w_bpSaved),
-         mean_w_bpFaced = mean(w_bpFaced))
+         mean_w_bpFaced = mean(w_bpFaced),
+         num = n())
 ```
 
 Now we have three data sets, each one with the statistics of a player's performance on a specific surface. 
@@ -199,7 +202,6 @@ Here is a link to the data sets: [https://github.com/JeffSackmann/tennis_atp](ht
 
 # Additional Work 
 
-
 Example
 ```{r}
 hard %>%
@@ -208,6 +210,11 @@ hard %>%
   count(winner_name) %>%
   arrange(desc(n))
 ```
+
+```{r}
+ggplot(data = clay, aes(x = mean_w_ace, y = winner_name)) + geom_boxplot()
+```
+
 
 
 
