@@ -27,10 +27,8 @@ The dataset that we will be using for our analysis is not the same as the one we
 
 Here is a glimpse of our dataset:
 ```{r}
-
+glimpse(winners)
 ```
-
-
 
 
 # Analysis 
@@ -116,7 +114,44 @@ winners <- rbind(winners2017, winners2016, winners2015, winners2014, winners2013
 ```
 
 ```{r}
-glimpse(winners)
+winners %>%
+  group_by(winner_name) %>%
+  count() %>%
+  arrange(desc(n))
+
+winners
 ```
+
+```{r}
+hard <- winners %>%
+  filter(surface == "Hard",
+         best_of == 3,
+         !is.na(w_ace)) %>%
+  group_by(winner_name) %>%
+  mutate(mean_w_ace = mean(w_ace))
+  
+
+hard 
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
