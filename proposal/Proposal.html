@@ -314,9 +314,13 @@ $(document).ready(function () {
 </div>
 
 
+<div id="our-packages" class="section level2">
+<h2>Our Packages</h2>
 <pre class="r"><code>library(tidyverse)</code></pre>
+</div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
+<p>In the sport of tennis, statisticians are often asked to analyze an individual player’s statistics on how well they are performing and what they could possibly do to perform better at tournaments. But often, information about how well other players are doing is left out of the picture when determining what a tennis player should work on, especially given that the sport is continuously changing as new techniques and racquets are being introduced. Using datasets from 2010-2017 of the Men’s ATP World Tour, we will attempt to solve the question “What makes a good tennis player?” using multiple linear regression models, filtering for each unique surface (Hard, Clay, and Grass). In our dataset, we will use the average winning statistics for players that have won tournaments in the tour, throughout these years. We are interested in solving what will give us the largest number of tournament wins, as that is what determines the “best player.” We will look at many variables and hope to see if we can use it to predict what stats the best tennis player should have, in order to win the most number of tournaments wins.</p>
 </div>
 <div id="data" class="section level1">
 <h1>Data</h1>
@@ -455,7 +459,7 @@ clay &lt;- clay[!myvars]</code></pre>
 
 myvars &lt;- names(grass) %in% c(&quot;loser_id&quot;, &quot;loser_seed&quot;, &quot;loser_entry&quot;, &quot;loser_name&quot;, &quot;loser_hand&quot;, &quot;loser_ht&quot;, &quot;loser_ioc&quot;, &quot;loser_age&quot;, &quot;loser_rank&quot;, &quot;loser_rank_points&quot;, &quot;l_ace&quot;, &quot;l_df&quot;, &quot;l_svpt&quot;, &quot;l_1stIn&quot;, &quot;l_1stWon&quot;, &quot;l_2ndWon&quot;, &quot;l_SvGms&quot;, &quot;l_bpSaved&quot;, &quot;l_bpFaced&quot;) 
 grass &lt;- grass[!myvars]</code></pre>
-<p>Now we have three data sets, each one with the statistics of a player’s performance on a specific surface.</p>
+<p>Now, we have three data sets, each one with the statistics of a player’s performance on a specific surface.</p>
 <pre class="r"><code>glimpse(hard)</code></pre>
 <pre><code>## Observations: 270
 ## Variables: 40
@@ -589,9 +593,39 @@ grass &lt;- grass[!myvars]</code></pre>
 <div id="analysis" class="section level1">
 <h1>Analysis</h1>
 <ol style="list-style-type: decimal">
-<li><p>Description of the response variable and its variable type</p></li>
-<li><p>Description of the explanatory variables and the population coefficients you wish to understand using statistical inference</p></li>
+<li>Our response variable is going to be <code>num</code>, a variable that we created that represents the number of tournaments wins for a tennis player. The variable type is an integer. One interest thing that we initially noticed is that the number of tournament wins varied greatly within each group type: Hard, Clay, and Grass, which just means that for some tournaments, being a consistent tournament winner is more likely in a surface type over another.</li>
 </ol>
+<pre class="r"><code>winners %&gt;%
+  filter(!is.na(w_ace), 
+         !is.na(w_df), 
+         !is.na(w_svpt), 
+         !is.na(w_1stIn), 
+         !is.na(w_1stWon), 
+         !is.na(w_2ndWon),
+         !is.na(w_SvGms), 
+         !is.na(w_bpSaved),
+         !is.na(w_bpFaced),
+         best_of == 3) %&gt;%
+  group_by(surface) %&gt;%
+  mutate(num = n()) %&gt;%
+  count(num) %&gt;%
+  select(surface, num)</code></pre>
+<pre><code>## # A tibble: 3 x 2
+## # Groups:   surface [3]
+##   surface   num
+##   &lt;chr&gt;   &lt;int&gt;
+## 1 Clay      172
+## 2 Grass      43
+## 3 Hard      270</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>The explanatory variables that we wish to understand are the ones that can be changed by a player. The variables include:</li>
+</ol>
+<ul>
+<li><p><code>w_ace</code> : The amount of aces played by the winner in the final match of the tournament.</p></li>
+<li><p><code>w_df</code> : the amount of double faults by the winner in the final match of the tournament.</p></li>
+<li><p><code>w_svpt</code> : the amount of service points won by the winner in the final match of the tournament.</p></li>
+<li></li>
+</ul>
 <p>possible explanatory variables: winner hand, winner age, winner rank, winner rank points</p>
 <ol start="3" style="list-style-type: decimal">
 <li><p>Hypothesis/hypotheses regarding your question of interest</p></li>

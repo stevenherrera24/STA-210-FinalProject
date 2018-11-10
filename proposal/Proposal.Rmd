@@ -3,8 +3,8 @@ title: "What Makes the Best Tennis Player?"
 author: "Steven Herrera and Ethan Shen"
 date: "11/09/2018"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, message=F,include=F}
@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 options(knitr.kable.NA = '')
 ```
 
+## Our Packages
 ```{r load-packages, message=FALSE}
 library(tidyverse)
 ```
@@ -30,7 +31,7 @@ The data sets that we will be using for our analysis is not the same as the ones
 atp <- read_csv("files/atp.csv")
 ```
 
-2) There are a lot of things interesting about this dataset. The first thing that we did was filter for events that are normal tournament-style matches (not ATP Final events or Davis Cup, which both occur past November 13, 2017, coded as `20171113` in the dataset under the `tourney_name` variable).
+2) There are a lot of things interesting about this dataset. The first thing that we did was filter for events that are normal tournament-style matches (not ATP Final events or Davis Cup, which both occur past November 13, 2017, coded as `20171113` in the dataset under the `tourney_date` variable).
 
 ```{r}
 atp1 <- atp %>%
@@ -85,7 +86,8 @@ winners2010 <- atp2010 %>%
 ```
 
 ```{r}
-winners <- rbind(winners2017, winners2016, winners2015, winners2014, winners2013, winners2012, winners2011, winners2010)
+winners <- rbind(winners2017, winners2016, winners2015, winners2014, winners2013, 
+                 winners2012, winners2011, winners2010)
 ```
 
 5) We want to look at the statistics from each game based on the type of surface. Thus, we created three new data sets, each one filtered for a specific surface. For each data set, we first filtered out the NA's, which are in the original data set because those statistics were not recorded at the tournament. Then, we grouped by the winner's name and found the mean of each of the variables for that specific player. 
@@ -113,9 +115,14 @@ hard <- winners %>%
          mean_w_SvGms = mean(w_SvGms),
          mean_w_bpSaved = mean(w_bpSaved),
          mean_w_bpFaced = mean(w_bpFaced),
+         mean_minutes = mean(minutes),
          num = n())
 
-myvars <- names(hard) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name", "loser_hand", "loser_ht", "loser_ioc", "loser_age", "loser_rank", "loser_rank_points", "l_ace", "l_df", "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", "l_bpSaved", "l_bpFaced") 
+myvars <- names(hard) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name",
+                             "loser_hand", "loser_ht", "loser_ioc", "loser_age", 
+                             "loser_rank", "loser_rank_points", "l_ace", "l_df", 
+                             "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", 
+                             "l_bpSaved", "l_bpFaced") 
 hard <- hard[!myvars]
 ``` 
 
@@ -143,9 +150,14 @@ clay <- winners %>%
          mean_w_SvGms = mean(w_SvGms),
          mean_w_bpSaved = mean(w_bpSaved),
          mean_w_bpFaced = mean(w_bpFaced),
+         mean_minutes = mean(minutes),
          num = n())
 
-myvars <- names(clay) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name", "loser_hand", "loser_ht", "loser_ioc", "loser_age", "loser_rank", "loser_rank_points", "l_ace", "l_df", "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", "l_bpSaved", "l_bpFaced") 
+myvars <- names(clay) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name",
+                             "loser_hand", "loser_ht", "loser_ioc", "loser_age",
+                             "loser_rank", "loser_rank_points", "l_ace", "l_df",
+                             "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms",
+                             "l_bpSaved", "l_bpFaced") 
 clay <- clay[!myvars]
 ```
 
@@ -172,34 +184,44 @@ grass <- winners %>%
          mean_w_SvGms = mean(w_SvGms),
          mean_w_bpSaved = mean(w_bpSaved),
          mean_w_bpFaced = mean(w_bpFaced),
+         mean_minutes = mean(minutes),
          num = n())
 
-myvars <- names(grass) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name", "loser_hand", "loser_ht", "loser_ioc", "loser_age", "loser_rank", "loser_rank_points", "l_ace", "l_df", "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", "l_bpSaved", "l_bpFaced") 
+myvars <- names(grass) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name",
+                              "loser_hand", "loser_ht", "loser_ioc", "loser_age",
+                              "loser_rank", "loser_rank_points", "l_ace", "l_df", 
+                              "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms",
+                              "l_bpSaved", "l_bpFaced") 
 grass <- grass[!myvars]
 ```
 
-Now we have three data sets, each one with the statistics of a player's performance on a specific surface. 
+Now, we have three data sets, each one with the statistics of a player's performance on a specific surface. 
 
 ```{r}
 glimpse(hard)
 ```
 
+There are 270 observations in the Hard Court-only dataset, along with 41 variables.
+
 ```{r}
 glimpse(clay)
 ```
+
+There are 172 observations in the Clay Court-only dataset, along with 41 variables.
 
 ```{r}
 glimpse(grass)
 ```
 
+There are 43 observations in the Grass Court-only dataset, along with 41 variables.
+
 # Analysis 
 
-1) Our response variable is going to be `num`, a variable that we created that represents the number of tournaments wins for a tennis player. The variable type is an integer. One interest thing that we initially noticed is that the variable varies greatly within each group type: Hard, Clay, and Grass, which just means that for some tournaments, being a consistent tournament winner is more likely in a surface type over another.
+1) Our response variable is going to be `num`, a variable that we created that represents the number of tournaments wins for a tennis player. The variable type is an integer. One interest thing that we initially noticed is that the number of tournament wins varied greatly within each group type: Hard, Clay, and Grass, which just means that for some tournaments, being a consistent tournament winner is more likely in a surface type over another.
 
 ```{r}
 winners %>%
-  mutate(best_of == 3,
-         !is.na(w_ace), 
+  filter(!is.na(w_ace), 
          !is.na(w_df), 
          !is.na(w_svpt), 
          !is.na(w_1stIn), 
@@ -207,19 +229,51 @@ winners %>%
          !is.na(w_2ndWon),
          !is.na(w_SvGms), 
          !is.na(w_bpSaved),
-         !is.na(w_bpFaced)) %>%
+         !is.na(w_bpFaced),
+         best_of == 3) %>%
   group_by(surface) %>%
-  count()
+  mutate(num = n()) %>%
+  count(num) %>%
+  select(surface, num)
 ```
 
+2) The explanatory variables that we wish to understand are the ones that can be changed by a player. The variables include: 
 
-2) Description of the explanatory variables and the population coefficients you wish to understand using statistical inference
+  + `mean_w_ace` : the average amount of aces played. 
+  
+  + `mean_w_df` : the average amount of double faults.
+  
+  + `mean_w_svpt` : the average amount of service points won.
+  
+  + `mean_w_1stIn` : the average first-service percentage. 
+  
+  + `mean_w_1stWon` : the average winning percentage of the point, given that it was a first serve.
+  
+  + `mean_w_2ndWon` : the average winnning percentage of the point, given that it was a first serve.
+  
+  + `mean_w_SvGms` : the average amount of service games.
+  
+  + `mean_w_bpSaved` : the average amount of break points saved.
+  
+  + `mean_w_bpFaced` : the average amount of break points faced.
+  
+  + `mean_minutes` : the average time it takes to win the match, in minutes.
 
-possible explanatory variables: winner hand, winner age, winner rank, winner rank points
+ + We understand that all of these variables are numerical, so differences among groups isn't a concern, since we already established that the "best tennis player" differs greatly by surface type and we would not be testing whether that is different.
 
-3) Hypothesis/hypotheses regarding your question of interest
+3) The hypotheses tests that we will be using are nested F-tests to determine which variables best determine the amount of tournament wins from 2010-2017. We will begin with using a backwards selection method, and then determine what variables best explain our response variable by interpreting the variables of interest in our model.
 
-4) Proposed methods to use for the analysis 
+4) The proposed methods we will be using in our model include:
+
++ Exploratory Data Analysis, in which we check for potential issues or multicollinearity.
+
++ Backwards Selection Modelling
+
++ ANOVA Nested F-tests
+
++ Assumptions (and appropriately adjusting our model to meet the assumptions)
+
++ Conclusion with detailed analysis of our model, which includes how well our model predicts and examples of how this information can be used to consult tennis players.
 
 # Reference 
 
@@ -227,10 +281,8 @@ We used the following data sets: `atp_matches_2017`, `atp_matches_2016`,`atp_mat
 
 Here is a link to the data sets: [https://github.com/JeffSackmann/tennis_atp](https://github.com/JeffSackmann/tennis_atp).  
 
-# Additional Work 
-
-Example
-```{r}
+```{r message=FALSE, include=FALSE}
+#Example
 hard %>%
   group_by(mean_w_ace) %>%
   select(winner_name, mean_w_ace) %>%
