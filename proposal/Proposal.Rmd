@@ -1,0 +1,67 @@
+---
+title: "What Makes the Best Tennis Player?"
+author: "Steven Herrera and Ethan Shen"
+date: "11/09/2018"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, message=F,include=F}
+knitr::opts_chunk$set(echo = TRUE)
+options(knitr.kable.NA = '')
+```
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+```
+
+# Introduction
+
+# Data 
+
+We used the following data set: `atp_matches_2017`, created by JeffSackMann on GitHub.  
+Here is a link to the dataset: [https://github.com/JeffSackmann/tennis_atp/blob/master/atp_matches_2017.csv](https://github.com/JeffSackmann/tennis_atp/blob/master/atp_matches_2017.csv).  
+  
+The dataset that we will be using for our analysis is not the same as the one we initially received, as multiple dataset manipulation techniques were used in Excel and in R. Look at **Additional Work**.
+
+Here is a glimpse of our dataset:
+```{r}
+
+```
+
+
+
+
+# Analysis 
+
+1) Description of the response variable and its variable type
+
+2) Description of the explanatory variables and the population coefficients you wish to understand using statistical inference
+
+3) Hypothesis/hypotheses regarding your question of interest
+
+4) Proposed methods to use for the analysis 
+
+# Reference 
+
+
+
+# Additional Work 
+
+1) In order to obtain the dataset in our RMD, we will first need the data to fit nicely into a CSV file. In excel, we used the `Text to Columns` function, and inserted the file here:
+
+```{r message=FALSE}
+atp <- read_csv("atp.csv")
+```
+
+2) There are a lot of things interesting about this dataset. The first thing that I will do is filter for events that are normal tournament-style matches (not ATP Final events or Davis Cup, which both occur past November 13, 2017, coded as `20171113` in the dataset under the `tourney_name` variable).
+
+```{r}
+atp1 <- atp %>%
+  filter(tourney_date < 20171113)
+```
+
+3) 
+
+
