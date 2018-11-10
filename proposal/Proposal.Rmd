@@ -74,6 +74,11 @@ winners <- atp1 %>%
 ```{r message=FALSE}
 atp2016 <- read_csv("files/atp2016.csv")
 atp2015 <- read_csv("files/atp2015.csv")
+atp2014 <- read_csv("files/atp2014.csv")
+atp2013 <- read_csv("files/atp2013.csv")
+atp2012 <- read_csv("files/atp2012.csv")
+atp2011 <- read_csv("files/atp2011.csv")
+atp2010 <- read_csv("files/atp2010.csv")
 ```
 
 
