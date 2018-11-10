@@ -39,6 +39,8 @@ Here is a glimpse of our dataset:
 
 2) Description of the explanatory variables and the population coefficients you wish to understand using statistical inference
 
+possible explanatory variables: winner hand, winner age, winner rank, winner rank points
+
 3) Hypothesis/hypotheses regarding your question of interest
 
 4) Proposed methods to use for the analysis 
