@@ -18,10 +18,11 @@ library(tidyverse)
 
 # Introduction
 
+In the sport of tennis, statisticians are often asked to analyze an individual player’s statistics on how well they are performing and what they could possibly do to perform better at tournaments. But often, information about how well other players are doing is left out of the picture when determining what a tennis player should work on, especially given that the sport is continuously changing as new techniques and racquets are being introduced. Using datasets from 2010-2017 of the Men’s ATP World Tour, we will attempt to solve the question “What makes a good tennis player?” using multiple linear regression models, filtering for each unique surface (Hard, Clay, and Grass). In our dataset, we will use the average winning statistics for players that have won tournaments in the tour, throughout these years. We are interested in solving what will give us the largest number of tournament wins, as that is what determines the “best player.” We will look at many variables and hope to see if we can use it to predict what stats the best tennis player should have, in order to win the most number of tournaments wins.
+
 # Data 
 
 The data sets that we will be using for our analysis is not the same as the ones we initially received, as multiple data set manipulation techniques were used in Excel and in R. 
-
 
 1) In order to obtain the dataset in our RMD, we will first need the data to fit nicely into a CSV file. In excel, we used the `Text to Columns` function, and inserted the file here:
 
@@ -193,7 +194,24 @@ glimpse(grass)
 
 # Analysis 
 
-1) Description of the response variable and its variable type
+1) Our response variable is going to be `num`, a variable that we created that represents the number of tournaments wins for a tennis player. The variable type is an integer. One interest thing that we initially noticed is that the variable varies greatly within each group type: Hard, Clay, and Grass, which just means that for some tournaments, being a consistent tournament winner is more likely in a surface type over another.
+
+```{r}
+winners %>%
+  mutate(best_of == 3,
+         !is.na(w_ace), 
+         !is.na(w_df), 
+         !is.na(w_svpt), 
+         !is.na(w_1stIn), 
+         !is.na(w_1stWon), 
+         !is.na(w_2ndWon),
+         !is.na(w_SvGms), 
+         !is.na(w_bpSaved),
+         !is.na(w_bpFaced)) %>%
+  group_by(surface) %>%
+  count()
+```
+
 
 2) Description of the explanatory variables and the population coefficients you wish to understand using statistical inference
 
