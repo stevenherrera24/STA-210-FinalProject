@@ -55,13 +55,19 @@ Here is a glimpse of our dataset:
 atp <- read_csv("atp.csv")
 ```
 
-2) There are a lot of things interesting about this dataset. The first thing that I will do is filter for events that are normal tournament-style matches (not ATP Final events or Davis Cup, which both occur past November 13, 2017, coded as `20171113` in the dataset under the `tourney_name` variable).
+2) There are a lot of things interesting about this dataset. The first thing that we did was filter for events that are normal tournament-style matches (not ATP Final events or Davis Cup, which both occur past November 13, 2017, coded as `20171113` in the dataset under the `tourney_name` variable).
 
 ```{r}
 atp1 <- atp %>%
   filter(tourney_date < 20171113)
 ```
 
-3) 
+3) Because we are interested in winners, we will only look at the observations where the match was a **final**.
+
+```{r}
+atp1 %>%
+  filter(round == "F")
+```
+
 
 
