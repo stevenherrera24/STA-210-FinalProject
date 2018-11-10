@@ -20,34 +20,8 @@ library(tidyverse)
 
 # Data 
 
-We used the following data set: `atp_matches_2017`, created by JeffSackMann on GitHub.  
-Here is a link to the dataset: [https://github.com/JeffSackmann/tennis_atp/blob/master/atp_matches_2017.csv](https://github.com/JeffSackmann/tennis_atp/blob/master/atp_matches_2017.csv).  
-  
-The dataset that we will be using for our analysis is not the same as the one we initially received, as multiple dataset manipulation techniques were used in Excel and in R. Look at **Additional Work**.
+The data sets that we will be using for our analysis is not the same as the ones we initially received, as multiple data set manipulation techniques were used in Excel and in R. 
 
-Here is a glimpse of our dataset:
-```{r}
-glimpse(winners)
-```
-
-
-# Analysis 
-
-1) Description of the response variable and its variable type
-
-2) Description of the explanatory variables and the population coefficients you wish to understand using statistical inference
-
-possible explanatory variables: winner hand, winner age, winner rank, winner rank points
-
-3) Hypothesis/hypotheses regarding your question of interest
-
-4) Proposed methods to use for the analysis 
-
-# Reference 
-
-
-
-# Additional Work 
 
 1) In order to obtain the dataset in our RMD, we will first need the data to fit nicely into a CSV file. In excel, we used the `Text to Columns` function, and inserted the file here:
 
@@ -113,26 +87,128 @@ winners2010 <- atp2010 %>%
 winners <- rbind(winners2017, winners2016, winners2015, winners2014, winners2013, winners2012, winners2011, winners2010)
 ```
 
-```{r}
-winners %>%
-  group_by(winner_name) %>%
-  count() %>%
-  arrange(desc(n))
-
-winners
-```
+5) We want to look at the statistics from each game based on the type of surface. Thus, we created three new data sets, each one filtered for a specific surface. For each data set, we first filtered out the NA's, which are in the original data set because those statistics were not recorded at the tournament. Then, we grouped by the winner's name and found the mean of each of the variables for that specific player. 
 
 ```{r}
 hard <- winners %>%
   filter(surface == "Hard",
          best_of == 3,
-         !is.na(w_ace)) %>%
+         !is.na(w_ace), 
+         !is.na(w_df), 
+         !is.na(w_svpt), 
+         !is.na(w_1stIn), 
+         !is.na(w_1stWon), 
+         !is.na(w_2ndWon),
+         !is.na(w_SvGms), 
+         !is.na(w_bpSaved),
+         !is.na(w_bpFaced)) %>%
   group_by(winner_name) %>%
-  mutate(mean_w_ace = mean(w_ace))
-  
+  mutate(mean_w_ace = mean(w_ace),
+         mean_w_df = mean(w_df),
+         mean_w_svpt = mean(w_svpt),
+         mean_w_1stIn = mean(w_1stIn),
+         mean_w_1stWon = mean(w_1stWon),
+         mean_w_2ndWon = mean(w_2ndWon),
+         mean_w_SvGms = mean(w_SvGms),
+         mean_w_bpSaved = mean(w_bpSaved),
+         mean_w_bpFaced = mean(w_bpFaced))
+``` 
 
-hard 
+
+```{r}
+clay <- winners %>%
+  filter(surface == "Clay",
+         best_of == 3,
+         !is.na(w_ace), 
+         !is.na(w_df), 
+         !is.na(w_svpt), 
+         !is.na(w_1stIn), 
+         !is.na(w_1stWon), 
+         !is.na(w_2ndWon),
+         !is.na(w_SvGms), 
+         !is.na(w_bpSaved),
+         !is.na(w_bpFaced)) %>%
+  group_by(winner_name) %>%
+  mutate(mean_w_ace = mean(w_ace),
+         mean_w_df = mean(w_df),
+         mean_w_svpt = mean(w_svpt),
+         mean_w_1stIn = mean(w_1stIn),
+         mean_w_1stWon = mean(w_1stWon),
+         mean_w_2ndWon = mean(w_2ndWon),
+         mean_w_SvGms = mean(w_SvGms),
+         mean_w_bpSaved = mean(w_bpSaved),
+         mean_w_bpFaced = mean(w_bpFaced))
 ```
+
+```{r}
+grass <- winners %>%
+  filter(surface == "Grass",
+         best_of == 3,
+         !is.na(w_ace), 
+         !is.na(w_df), 
+         !is.na(w_svpt), 
+         !is.na(w_1stIn), 
+         !is.na(w_1stWon), 
+         !is.na(w_2ndWon),
+         !is.na(w_SvGms), 
+         !is.na(w_bpSaved),
+         !is.na(w_bpFaced)) %>%
+  group_by(winner_name) %>%
+  mutate(mean_w_ace = mean(w_ace),
+         mean_w_df = mean(w_df),
+         mean_w_svpt = mean(w_svpt),
+         mean_w_1stIn = mean(w_1stIn),
+         mean_w_1stWon = mean(w_1stWon),
+         mean_w_2ndWon = mean(w_2ndWon),
+         mean_w_SvGms = mean(w_SvGms),
+         mean_w_bpSaved = mean(w_bpSaved),
+         mean_w_bpFaced = mean(w_bpFaced))
+```
+
+Now we have three data sets, each one with the statistics of a player's performance on a specific surface. 
+
+```{r}
+glimpse(hard)
+```
+
+```{r}
+glimpse(clay)
+```
+
+```{r}
+glimpse(grass)
+```
+
+# Analysis 
+
+1) Description of the response variable and its variable type
+
+2) Description of the explanatory variables and the population coefficients you wish to understand using statistical inference
+
+possible explanatory variables: winner hand, winner age, winner rank, winner rank points
+
+3) Hypothesis/hypotheses regarding your question of interest
+
+4) Proposed methods to use for the analysis 
+
+# Reference 
+
+We used the following data sets: `atp_matches_2017`, `atp_matches_2016`,`atp_matches_2015`, `atp_matches_2014`, `atp_matches_2013`, `atp_matches_2012`, `atp_matches_2011`, `atp_matches_2010`, all created by JeffSackMann on GitHub.  
+
+Here is a link to the data sets: [https://github.com/JeffSackmann/tennis_atp](https://github.com/JeffSackmann/tennis_atp).  
+
+# Additional Work 
+
+
+Example
+```{r}
+hard %>%
+  group_by(mean_w_ace) %>%
+  select(winner_name, mean_w_ace) %>%
+  count(winner_name) %>%
+  arrange(desc(n))
+```
+
 
 
 
