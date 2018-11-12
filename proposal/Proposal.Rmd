@@ -20,7 +20,7 @@ library(tidyverse)
 # Introduction
 
 In the sport of tennis, statisticians are often asked to analyze an individual player’s statistics on how well they are performing and what they could possibly do to perform better at tournaments. But often, information about how well other players are doing is left out of the picture when determining what a tennis player should work on, especially given that the sport is continuously changing as new techniques and racquets are being introduced. Using datasets from 2010-2017 of the Men’s ATP World Tour, we will attempt to solve the question “What makes a good tennis player?” using multiple linear regression models, filtering for each unique surface (Hard, Clay, and Grass). In our dataset, we will use the average winning statistics for players that have won tournaments in the tour, throughout these years. We are interested in solving what will give us the largest number of tournament wins, as that is what determines the “best player.” We will look at many variables and hope to see if we can use it to predict what stats the best tennis player should have, in order to win the most number of tournaments wins.
-
+ 
 # Data 
 
 The data sets that we will be using for our analysis is not the same as the ones we initially received, as multiple data set manipulation techniques were used in Excel and in R. 
@@ -90,7 +90,7 @@ winners <- rbind(winners2017, winners2016, winners2015, winners2014, winners2013
                  winners2012, winners2011, winners2010)
 ```
 
-5) We want to look at the statistics from each game based on the type of surface. Thus, we created three new data sets, each one filtered for a specific surface. For each data set, we first filtered out the NA's, which are in the original data set because those statistics were not recorded at the tournament. Then, we grouped by the winner's name and found the mean of each of the variables for that specific player. 
+5) We want to look at the statistics from each game based on the type of surface. Thus, we created three new data sets, each one filtered for a specific surface. For each data set, we first filtered out the NA's, which are in the original data set because those statistics were not recorded at the tournament. Then, we grouped by the winner's name and found the mean of each of the variables for that specific player. We also removed the variables with the statistics of the loser. 
 
 ```{r}
 hard <- winners %>%
@@ -261,7 +261,7 @@ winners %>%
 
  + We understand that all of these variables are numerical, so differences among groups isn't a concern, since we already established that the "best tennis player" differs greatly by surface type and we would not be testing whether that is different.
 
-3) The hypotheses tests that we will be using are nested F-tests to determine which variables best determine the amount of tournament wins from 2010-2017. We will begin with using a backwards selection method, and then determine what variables best explain our response variable by interpreting the variables of interest in our model.
+3) The hypotheses tests that we will be using are nested F-tests to determine which variables best determine the amount of tournament wins from 2010-2017. We will begin with using a backwards selection method, and then determine what variables best explain our response variable by interpreting the variables of interest in our model. We will also consider interaction variables, and use nested F-tests to determine if those interactions are significant. 
 
 4) The proposed methods we will be using in our model include:
 
@@ -289,18 +289,6 @@ hard %>%
   count(winner_name) %>%
   arrange(desc(n))
 ```
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
