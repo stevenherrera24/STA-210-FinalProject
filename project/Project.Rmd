@@ -187,14 +187,17 @@ pairs(num ~ winner_seed + winner_ht + winner_age + winner_rank +
       main = "Matrix of scatterplots for Tournament Wins and Variables")
 ```
 
-
-
 # Linear Regression
 
 To begin our regression models, we will
 
 ```{r}
-
+hardcourtmodel <- lm(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
+        mean_w_df + mean_w_svpt + mean_w_bpSaved, data=hard)
+claycourtmodel <- lm(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
+        mean_w_df + mean_w_svpt + mean_w_bpSaved, data=clay)
+grasscourtmodel <- lm(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
+        mean_w_df + mean_w_svpt + mean_w_bpSaved, data=grass)
 ```
 
 ```{r}
