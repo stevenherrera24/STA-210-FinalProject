@@ -13,6 +13,10 @@ library(olsrr)
 library(cowplot)
 library(car)
 library(broom)
+<<<<<<< HEAD
+=======
+library(knitr)
+>>>>>>> 4730b400ffaf44cfb7acbc6bdeb2aa308f642219
 ```
 
 ```{r message=FALSE, include=FALSE}
@@ -62,9 +66,8 @@ winners2010 <- atp2010 %>%
 winners <- rbind(winners2017, winners2016, winners2015, winners2014, winners2013, 
                  winners2012, winners2011, winners2010)
 
-hard <- winners %>%
-  filter(surface == "Hard",
-         best_of == 3,
+winners_set <- winners %>%
+  filter(best_of == 3,
          !is.na(w_ace), 
          !is.na(w_df), 
          !is.na(w_svpt), 
@@ -87,107 +90,27 @@ hard <- winners %>%
          mean_minutes = mean(minutes),
          num = n())
 
-myvars <- names(hard) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name",
+myvars <- names(winners_set) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name",
                              "loser_hand", "loser_ht", "loser_ioc", "loser_age", 
                              "loser_rank", "loser_rank_points", "l_ace", "l_df", 
                              "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", 
                              "l_bpSaved", "l_bpFaced") 
-hard <- hard[!myvars]
-
-clay <- winners %>%
-  filter(surface == "Clay",
-         best_of == 3,
-         !is.na(w_ace), 
-         !is.na(w_df), 
-         !is.na(w_svpt), 
-         !is.na(w_1stIn), 
-         !is.na(w_1stWon), 
-         !is.na(w_2ndWon),
-         !is.na(w_SvGms), 
-         !is.na(w_bpSaved),
-         !is.na(w_bpFaced)) %>%
-  group_by(winner_name) %>%
-  mutate(mean_w_ace = mean(w_ace),
-         mean_w_df = mean(w_df),
-         mean_w_svpt = mean(w_svpt),
-         mean_w_1stIn = mean(w_1stIn),
-         mean_w_1stWon = mean(w_1stWon),
-         mean_w_2ndWon = mean(w_2ndWon),
-         mean_w_SvGms = mean(w_SvGms),
-         mean_w_bpSaved = mean(w_bpSaved),
-         mean_w_bpFaced = mean(w_bpFaced),
-         mean_minutes = mean(minutes),
-         num = n())
-
-myvars <- names(clay) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name",
-                             "loser_hand", "loser_ht", "loser_ioc", "loser_age",
-                             "loser_rank", "loser_rank_points", "l_ace", "l_df",
-                             "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms",
-                             "l_bpSaved", "l_bpFaced") 
-clay <- clay[!myvars]
-
-grass <- winners %>%
-  filter(surface == "Grass",
-         best_of == 3,
-         !is.na(w_ace), 
-         !is.na(w_df), 
-         !is.na(w_svpt), 
-         !is.na(w_1stIn), 
-         !is.na(w_1stWon), 
-         !is.na(w_2ndWon),
-         !is.na(w_SvGms), 
-         !is.na(w_bpSaved),
-         !is.na(w_bpFaced)) %>%
-  group_by(winner_name) %>%
-  mutate(mean_w_ace = mean(w_ace),
-         mean_w_df = mean(w_df),
-         mean_w_svpt = mean(w_svpt),
-         mean_w_1stIn = mean(w_1stIn),
-         mean_w_1stWon = mean(w_1stWon),
-         mean_w_2ndWon = mean(w_2ndWon),
-         mean_w_SvGms = mean(w_SvGms),
-         mean_w_bpSaved = mean(w_bpSaved),
-         mean_w_bpFaced = mean(w_bpFaced),
-         mean_minutes = mean(minutes),
-         num = n())
-
-myvars <- names(grass) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name",
-                              "loser_hand", "loser_ht", "loser_ioc", "loser_age",
-                              "loser_rank", "loser_rank_points", "l_ace", "l_df", 
-                              "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms",
-                              "l_bpSaved", "l_bpFaced") 
-grass <- grass[!myvars]
+winners_set <- winners_set[!myvars]
 ```
+
 
 # Exploratory Data Analysis 
 
-## Hard court
+To begin our exploratory data analysis, we will examine the matrix plots for all three court surfaces, with the response variable being `num` and all other variables we deemed important in our proposal.
+
+## Matrix Plot
 ```{r fig.height=11, fig.width=11}
 pairs(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
         mean_w_df + mean_w_svpt + mean_w_1stIn + mean_w_1stWon + 
         mean_w_2ndWon + mean_w_SvGms + mean_w_bpSaved + mean_w_bpFaced + 
-        mean_minutes, data=hard, pch = 16,
+        mean_minutes, data=winners_set, pch = 16,
       main = "Matrix of scatterplots for Tournament Wins and Variables")
 ```
-
-## Clay Court
-```{r fig.height=11, fig.width=11}
-pairs(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
-        mean_w_df + mean_w_svpt + mean_w_1stIn + mean_w_1stWon + 
-        mean_w_2ndWon + mean_w_SvGms + mean_w_bpSaved + mean_w_bpFaced + 
-        mean_minutes, data=clay, pch = 16,
-      main = "Matrix of scatterplots for Tournament Wins and Variables")
-```
-
-## Grass Court
-```{r fig.height=11, fig.width=11}
-pairs(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
-        mean_w_df + mean_w_svpt + mean_w_1stIn + mean_w_1stWon + 
-        mean_w_2ndWon + mean_w_SvGms + mean_w_bpSaved + mean_w_bpFaced + 
-        mean_minutes, data=grass, pch = 16,
-      main = "Matrix of scatterplots for Tournament Wins and Variables")
-```
-
 # Linear Regression
 
 To begin our regression models, we will
