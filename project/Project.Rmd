@@ -3,13 +3,15 @@ title: "Project"
 author: "Steven Herrera and Ethan Shen"
 date: "11/09/2018"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r load-packages, message=FALSE}
 library(tidyverse)
 library(olsrr)
+library(cowplot)
+library(car)
 ```
 
 ```{r message=FALSE, include=FALSE}
@@ -158,21 +160,44 @@ grass <- grass[!myvars]
 
 # Exploratory Data Analysis 
 
-```{r}
-p1 <- ggplot(data=hard, mapping = aes(x=mean_w_ace,y=num)) +
-  geom_point()
-hard
+## Hard court
+```{r fig.height=11, fig.width=11}
+pairs(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
+        mean_w_df + mean_w_svpt + mean_w_1stIn + mean_w_1stWon + 
+        mean_w_2ndWon + mean_w_SvGms + mean_w_bpSaved + mean_w_bpFaced + 
+        mean_minutes, data=hard, pch = 16,
+      main = "Matrix of scatterplots for Tournament Wins and Variables")
 ```
 
+## Clay Court
+```{r fig.height=11, fig.width=11}
+pairs(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
+        mean_w_df + mean_w_svpt + mean_w_1stIn + mean_w_1stWon + 
+        mean_w_2ndWon + mean_w_SvGms + mean_w_bpSaved + mean_w_bpFaced + 
+        mean_minutes, data=clay, pch = 16,
+      main = "Matrix of scatterplots for Tournament Wins and Variables")
+```
 
-
+## Grass Court
+```{r fig.height=11, fig.width=11}
+pairs(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
+        mean_w_df + mean_w_svpt + mean_w_1stIn + mean_w_1stWon + 
+        mean_w_2ndWon + mean_w_SvGms + mean_w_bpSaved + mean_w_bpFaced + 
+        mean_minutes, data=grass, pch = 16,
+      main = "Matrix of scatterplots for Tournament Wins and Variables")
+```
 
 # Linear Regression
 
 To begin our regression models, we will
 
 ```{r}
-
+hardcourtmodel <- lm(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
+        mean_w_df + mean_w_svpt + mean_w_bpSaved, data=hard)
+claycourtmodel <- lm(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
+        mean_w_df + mean_w_svpt + mean_w_bpSaved, data=clay)
+grasscourtmodel <- lm(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
+        mean_w_df + mean_w_svpt + mean_w_bpSaved, data=grass)
 ```
 
 ```{r}
@@ -239,7 +264,6 @@ To begin our regression models, we will
 
 ```{r}
 testhard <- lm(num ~ winner_seed + winner_ht + winner_age + winner_rank + mean_w_df + mean_w_svpt + mean_w_1stIn + mean_w_1stWon + mean_w_2ndWon + mean_w_SvGms + mean_w_bpSaved + mean_w_bpFaced + mean_minutes, data = hard)
-tidy(testhard)
 ```
 
 ```{r}
