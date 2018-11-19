@@ -1,0 +1,8 @@
+---
+title: "Project"
+author: "Steven Herrera and Ethan Shen"
+date: "11/09/2018"
+output:
+  pdf_document: default
+  html_document: default
+---
