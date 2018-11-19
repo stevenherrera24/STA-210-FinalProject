@@ -72,16 +72,16 @@ hard <- winners %>%
          !is.na(w_bpSaved),
          !is.na(w_bpFaced)) %>%
   group_by(winner_name) %>%
-  mutate(aceCent = w_ace - mean(w_ace),
-         doubleFaultsCent = w_df- mean(w_df),
-         servicePercentageCent = w_svpt - mean(w_svpt),
-         firstServeInCent = w_1stIn - mean(w_1stIn),
-         firstServeWonCent = w_1stWon - mean(w_1stWon),
-         secondServeWonCent = w_2ndWon - mean(w_2ndWon),
-         savedGamesCent = w_SvGms - mean(w_SvGms),
-         breakPointSavedCent = w_bpSaved - mean(w_bpSaved),
-         breakPointFacedCent = w_bpFaced - mean(w_bpFaced),
-         minutesCent = minutes - mean(minutes),
+  mutate(mean_w_ace = mean(w_ace),
+         mean_w_df = mean(w_df),
+         mean_w_svpt = mean(w_svpt),
+         mean_w_1stIn = mean(w_1stIn),
+         mean_w_1stWon = mean(w_1stWon),
+         mean_w_2ndWon = mean(w_2ndWon),
+         mean_w_SvGms = mean(w_SvGms),
+         mean_w_bpSaved = mean(w_bpSaved),
+         mean_w_bpFaced = mean(w_bpFaced),
+         mean_minutes = mean(minutes),
          num = n())
 
 myvars <- names(hard) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name",
@@ -104,16 +104,16 @@ clay <- winners %>%
          !is.na(w_bpSaved),
          !is.na(w_bpFaced)) %>%
   group_by(winner_name) %>%
-  mutate(aceCent = w_ace - mean(w_ace),
-         doubleFaultsCent = w_df- mean(w_df),
-         servicePercentageCent = w_svpt - mean(w_svpt),
-         firstServeInCent = w_1stIn - mean(w_1stIn),
-         firstServeWonCent = w_1stWon - mean(w_1stWon),
-         secondServeWonCent = w_2ndWon - mean(w_2ndWon),
-         savedGamesCent = w_SvGms - mean(w_SvGms),
-         breakPointSavedCent = w_bpSaved - mean(w_bpSaved),
-         breakPointFacedCent = w_bpFaced - mean(w_bpFaced),
-         minutesCent = minutes - mean(minutes),
+  mutate(mean_w_ace = mean(w_ace),
+         mean_w_df = mean(w_df),
+         mean_w_svpt = mean(w_svpt),
+         mean_w_1stIn = mean(w_1stIn),
+         mean_w_1stWon = mean(w_1stWon),
+         mean_w_2ndWon = mean(w_2ndWon),
+         mean_w_SvGms = mean(w_SvGms),
+         mean_w_bpSaved = mean(w_bpSaved),
+         mean_w_bpFaced = mean(w_bpFaced),
+         mean_minutes = mean(minutes),
          num = n())
 
 myvars <- names(clay) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name",
@@ -136,16 +136,16 @@ grass <- winners %>%
          !is.na(w_bpSaved),
          !is.na(w_bpFaced)) %>%
   group_by(winner_name) %>%
-  mutate(aceCent = w_ace - mean(w_ace),
-         doubleFaultsCent = w_df- mean(w_df),
-         servicePercentageCent = w_svpt - mean(w_svpt),
-         firstServeInCent = w_1stIn - mean(w_1stIn),
-         firstServeWonCent = w_1stWon - mean(w_1stWon),
-         secondServeWonCent = w_2ndWon - mean(w_2ndWon),
-         savedGamesCent = w_SvGms - mean(w_SvGms),
-         breakPointSavedCent = w_bpSaved - mean(w_bpSaved),
-         breakPointFacedCent = w_bpFaced - mean(w_bpFaced),
-         minutesCent = minutes - mean(minutes),
+  mutate(mean_w_ace = mean(w_ace),
+         mean_w_df = mean(w_df),
+         mean_w_svpt = mean(w_svpt),
+         mean_w_1stIn = mean(w_1stIn),
+         mean_w_1stWon = mean(w_1stWon),
+         mean_w_2ndWon = mean(w_2ndWon),
+         mean_w_SvGms = mean(w_SvGms),
+         mean_w_bpSaved = mean(w_bpSaved),
+         mean_w_bpFaced = mean(w_bpFaced),
+         mean_minutes = mean(minutes),
          num = n())
 
 myvars <- names(grass) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name",
@@ -172,15 +172,11 @@ hard
 To begin our regression models, we will
 
 ```{r}
-testmodel <- lm(num ~ winner_age + winner_seed + winner_ht + winner_rank + 
-                  aceCent + doubleFaultsCent + servicePercentageCent + 
-                  firstServeInCent + firstServeWonCent + secondServeWonCent + 
-                  savedGamesCent + breakPointSavedCent + breakPointFacedCent + 
-                  minutesCent, data = hard)
+
 ```
 
 ```{r}
-backward <- ols_step_backward_aic(testmodel)
+#backward <- ols_step_backward_aic(testmodel)
 ```
 
 # Linear Regression Assumptions
