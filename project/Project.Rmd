@@ -178,7 +178,6 @@ pairs(num ~ winner_seed + winner_ht + winner_age + winner_rank +
       main = "Matrix of scatterplots for Tournament Wins and Variables")
 ```
 
-
 ## Grass Court
 ```{r fig.height=11, fig.width=11}
 pairs(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
