@@ -12,9 +12,7 @@ library(tidyverse)
 library(olsrr)
 ```
 
-# Exploratory Data Analysis 
-
-```{r message=FALSE}
+```{r message=FALSE, include=FALSE}
 atp <- read_csv("files/atp.csv")
 atp2016 <- read_csv("files/atp2016.csv")
 atp2015 <- read_csv("files/atp2015.csv")
@@ -57,13 +55,10 @@ winners2011 <- atp2011 %>%
 winners2010 <- atp2010 %>%
   filter(tourney_date < 20101121) %>%
   filter(round == "F")
-```
 
-```{r}
 winners <- rbind(winners2017, winners2016, winners2015, winners2014, winners2013, 
                  winners2012, winners2011, winners2010)
-```
-```{r}
+
 hard <- winners %>%
   filter(surface == "Hard",
          best_of == 3,
@@ -77,16 +72,16 @@ hard <- winners %>%
          !is.na(w_bpSaved),
          !is.na(w_bpFaced)) %>%
   group_by(winner_name) %>%
-  mutate(mean_w_ace = mean(w_ace),
-         mean_w_df = mean(w_df),
-         mean_w_svpt = mean(w_svpt),
-         mean_w_1stIn = mean(w_1stIn),
-         mean_w_1stWon = mean(w_1stWon),
-         mean_w_2ndWon = mean(w_2ndWon),
-         mean_w_SvGms = mean(w_SvGms),
-         mean_w_bpSaved = mean(w_bpSaved),
-         mean_w_bpFaced = mean(w_bpFaced),
-         mean_minutes = mean(minutes),
+  mutate(aceCent = w_ace - mean(w_ace),
+         doubleFaultsCent = w_df- mean(w_df),
+         servicePercentageCent = w_svpt - mean(w_svpt),
+         firstServeInCent = w_1stIn - mean(w_1stIn),
+         firstServeWonCent = w_1stWon - mean(w_1stWon),
+         secondServeWonCent = w_2ndWon - mean(w_2ndWon),
+         savedGamesCent = w_SvGms - mean(w_SvGms),
+         breakPointSavedCent = w_bpSaved - mean(w_bpSaved),
+         breakPointFacedCent = w_bpFaced - mean(w_bpFaced),
+         minutesCent = minutes - mean(minutes),
          num = n())
 
 myvars <- names(hard) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name",
@@ -95,10 +90,7 @@ myvars <- names(hard) %in% c("loser_id", "loser_seed", "loser_entry", "loser_nam
                              "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", 
                              "l_bpSaved", "l_bpFaced") 
 hard <- hard[!myvars]
-``` 
 
-
-```{r}
 clay <- winners %>%
   filter(surface == "Clay",
          best_of == 3,
@@ -112,16 +104,16 @@ clay <- winners %>%
          !is.na(w_bpSaved),
          !is.na(w_bpFaced)) %>%
   group_by(winner_name) %>%
-  mutate(mean_w_ace = mean(w_ace),
-         mean_w_df = mean(w_df),
-         mean_w_svpt = mean(w_svpt),
-         mean_w_1stIn = mean(w_1stIn),
-         mean_w_1stWon = mean(w_1stWon),
-         mean_w_2ndWon = mean(w_2ndWon),
-         mean_w_SvGms = mean(w_SvGms),
-         mean_w_bpSaved = mean(w_bpSaved),
-         mean_w_bpFaced = mean(w_bpFaced),
-         mean_minutes = mean(minutes),
+  mutate(aceCent = w_ace - mean(w_ace),
+         doubleFaultsCent = w_df- mean(w_df),
+         servicePercentageCent = w_svpt - mean(w_svpt),
+         firstServeInCent = w_1stIn - mean(w_1stIn),
+         firstServeWonCent = w_1stWon - mean(w_1stWon),
+         secondServeWonCent = w_2ndWon - mean(w_2ndWon),
+         savedGamesCent = w_SvGms - mean(w_SvGms),
+         breakPointSavedCent = w_bpSaved - mean(w_bpSaved),
+         breakPointFacedCent = w_bpFaced - mean(w_bpFaced),
+         minutesCent = minutes - mean(minutes),
          num = n())
 
 myvars <- names(clay) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name",
@@ -130,9 +122,7 @@ myvars <- names(clay) %in% c("loser_id", "loser_seed", "loser_entry", "loser_nam
                              "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms",
                              "l_bpSaved", "l_bpFaced") 
 clay <- clay[!myvars]
-```
 
-```{r}
 grass <- winners %>%
   filter(surface == "Grass",
          best_of == 3,
@@ -146,16 +136,16 @@ grass <- winners %>%
          !is.na(w_bpSaved),
          !is.na(w_bpFaced)) %>%
   group_by(winner_name) %>%
-  mutate(mean_w_ace = mean(w_ace),
-         mean_w_df = mean(w_df),
-         mean_w_svpt = mean(w_svpt),
-         mean_w_1stIn = mean(w_1stIn),
-         mean_w_1stWon = mean(w_1stWon),
-         mean_w_2ndWon = mean(w_2ndWon),
-         mean_w_SvGms = mean(w_SvGms),
-         mean_w_bpSaved = mean(w_bpSaved),
-         mean_w_bpFaced = mean(w_bpFaced),
-         mean_minutes = mean(minutes),
+  mutate(aceCent = w_ace - mean(w_ace),
+         doubleFaultsCent = w_df- mean(w_df),
+         servicePercentageCent = w_svpt - mean(w_svpt),
+         firstServeInCent = w_1stIn - mean(w_1stIn),
+         firstServeWonCent = w_1stWon - mean(w_1stWon),
+         secondServeWonCent = w_2ndWon - mean(w_2ndWon),
+         savedGamesCent = w_SvGms - mean(w_SvGms),
+         breakPointSavedCent = w_bpSaved - mean(w_bpSaved),
+         breakPointFacedCent = w_bpFaced - mean(w_bpFaced),
+         minutesCent = minutes - mean(minutes),
          num = n())
 
 myvars <- names(grass) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name",
@@ -166,16 +156,32 @@ myvars <- names(grass) %in% c("loser_id", "loser_seed", "loser_entry", "loser_na
 grass <- grass[!myvars]
 ```
 
+# Exploratory Data Analysis 
+
 ```{r}
-testmodel <- lm(num ~ mean_w_ace + mean_w_df + mean_w_svpt + mean_w_1stIn + mean_w_1stWon + mean_w_2ndWon + mean_w_SvGms + mean_w_bpSaved + mean_w_bpFaced + mean_minutes, data = hard)
+p1 <- ggplot(data=hard, mapping = aes(x=mean_w_ace,y=num)) +
+  geom_point()
+hard
+```
+
+
+
+
+# Linear Regression
+
+To begin our regression models, we will
+
+```{r}
+testmodel <- lm(num ~ winner_age + winner_seed + winner_ht + winner_rank + 
+                  aceCent + doubleFaultsCent + servicePercentageCent + 
+                  firstServeInCent + firstServeWonCent + secondServeWonCent + 
+                  savedGamesCent + breakPointSavedCent + breakPointFacedCent + 
+                  minutesCent, data = hard)
 ```
 
 ```{r}
 backward <- ols_step_backward_aic(testmodel)
 ```
-
-
-# Linear Regression
 
 # Linear Regression Assumptions
 
