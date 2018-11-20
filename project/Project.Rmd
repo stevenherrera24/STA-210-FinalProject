@@ -15,6 +15,9 @@ library(car)
 library(broom)
 library(knitr)
 library(arm)
+library(tidyr)
+library(pROC)
+library(arm)
 ```
 
 ```{r message=FALSE, include=FALSE}
@@ -64,7 +67,8 @@ winners_set <- winners %>%
          !is.na(w_2ndWon),
          !is.na(w_SvGms), 
          !is.na(w_bpSaved),
-         !is.na(w_bpFaced))
+         !is.na(w_bpFaced),
+         surface!="None")
 
 losers <- winners_set %>%
   mutate(seed = loser_seed,
@@ -85,29 +89,7 @@ losers <- winners_set %>%
          bpFaced = l_bpFaced,
          minutes = minutes,
          status = 0
-         )  %>%
-  select(tourney_id,
-         tourney_name,
-         surface,
-         tourney_date,
-         round,
-         minutes,
-         name,
-         hand,
-         ht,
-         age,
-         rank,
-         rankpoints,
-         ace,
-         df,
-         svpt,
-         firsstIn,
-         firsttWon,
-         secondndWon,
-         SvGms,
-         bpSaved,
-         bpFaced,
-         status)
+         )  
   
 
 winners <- winners_set %>%
@@ -129,31 +111,28 @@ winners <- winners_set %>%
          bpFaced = w_bpFaced,
          minutes = minutes,
          status = 1
-         ) %>%
-  select(tourney_id,
-         tourney_name,
-         surface,
-         tourney_date,
-         round,
-         minutes,
-         name,
-         hand,
-         ht,
-         age,
-         rank,
-         rankpoints,
-         ace,
-         df,
-         svpt,
-         firsstIn,
-         firsttWon,
-         secondndWon,
-         SvGms,
-         bpSaved,
-         bpFaced,
-         status)
+         ) 
 
 tennis <- rbind(winners,losers)
+tennis <- tennis %>%
+  filter(!is.na(seed),
+         !is.na(name),
+         !is.na(hand),
+         !is.na(ht),
+         !is.na(age),
+         !is.na(rank),
+         !is.na(rankpoints),
+         !is.na(ace),
+         !is.na(df),
+         !is.na(svpt),
+         !is.na(firsstIn),
+         !is.na(firsttWon),
+         !is.na(secondndWon),
+         !is.na(SvGms),
+         !is.na(bpSaved),
+         !is.na(bpFaced),
+         !is.na(minutes),
+         !is.na(status))
 ```
 
 # Data 
@@ -164,7 +143,7 @@ Using data manipulation skills in R, we shaped the dataset to show each observat
 glimpse(tennis)
 ```
 
-Because we have 30,146 observations, we will randomly select observations to be included in a smaller dataset so that we can effectively examine exploratory data analysis. Below, is our code on how we randomly selected the observations in our new dataset.
+Because we have 11,037 observations, we will randomly select observations to be included in a smaller dataset so that we can effectively examine exploratory data analysis. Below, is our code on how we randomly selected the observations in our new dataset.
 
 ```{r}
 set.seed(1234)
@@ -184,27 +163,7 @@ To begin our exploratory data analysis, we will examine a matrix plot of the var
 ## Matrix Plot
 ```{r fig.height=11, fig.width=11}
 ten <- ten %>%
-  mutate(status = as.factor(status))
-
-pairs(status ~ minutes + ht + age + rank + rankpoints + ace +
-        df + svpt + firsstIn + firsttWon + secondndWon + 
-        SvGms + bpSaved + bpFaced, data=ten, pch = 16,
-      main = "Matrix of scatterplots for Tournament Wins and Variables")
-```
-
-Immediately, we noticed that there was an observation that made the minutes variable plots look skewed. We examined it below:
-
-```{r}
-ten %>%
-  arrange(desc(minutes)) %>%
-  select(minutes)
-```
-
-Confirming on the following website: https://en.wikipedia.org/wiki/2016_Apia_International_Sydney_–_Men%27s_Singles we found that Jeremy Chardy did not in fact play a match that last 1,146 minutes. Therefore, we will consider removing the observation.
-
-```{r fig.height=11, fig.width=11}
-ten <- ten %>%
-  subset(minutes != 1146)
+  mutate(status = as.factor(status)) 
 
 pairs(status ~ minutes + ht + age + rank + rankpoints + ace +
         df + svpt + firsstIn + firsttWon + secondndWon + 
@@ -276,15 +235,15 @@ In looking at all of these observations, it seems like the medians of the numeri
 To begin our regression models, we will use all of the variables we deemed important from our exploratory data analysis.
 
 ```{r}
-full.model <- glm(status ~ minutes + ht + age + rank + 
+full_model <- glm(status ~ minutes + ht + age + rank + 
                 rankpoints + ace + df + bpSaved + surface, 
                 family=binomial,data=ten)
-kable(tidy(full.model), format="markdown", digits = 3)
+kable(tidy(full_model), format="markdown", digits = 3)
 ```
 
 
 ```{r}
-model.selected <- step(full.model,direction="backward")
+model.selected <- step(full_model,direction="backward")
 ```
 
 ```{r}
@@ -292,9 +251,7 @@ kable(tidy(model.selected), format = "markdown", digits = 3)
 ```
 
 ```{r}
-final.base.model <- glm(status ~ ht + rankpoints +
-                        ace + df + bpSaved + surface,
-                        family=binomial, data=ten)
+final.base.model <- model.selected
 kable(tidy(final.base.model), format = "markdown", digits = 3)
 ```
 
@@ -305,15 +262,56 @@ Interaction effects?
 Binned Plots with Residuals vs Predicted
 
 ```{r}
-ten %>%
-  mutate(predicted = predict.glm(final.base.model,type="response"),
-         residuals = residuals.glm(final.base.model,type="response"))
+ten <- ten %>% mutate(Residuals = residuals.glm(final.base.model,type="response"),
+                          Predicted = predict.glm(final.base.model,type="response"))
 
-binnedplot(x=ten$predicted,y=ten$residuals,xlab="Predicted")
+binnedplot(ten$Predicted, ten$Residuals,xlab="Predicted Probabilities",
+           ylab="Residuals",main="Binned Residuals vs. Predicted Probabilities")
+```
+
+```{r,fig.height=4,fig.width=4,echo=F}
+binnedplot(ten$minutes, ten$Residuals,xlab="Minutes",
+           ylab="Residuals",main="Binned Residuals vs. Minutes")
+
+binnedplot(ten$ht, ten$Residuals,xlab="Height",
+           ylab="Residuals",main="Binned Residuals vs. Height")
+
+binnedplot(ten$ace, ten$Residuals,xlab="Aces",
+           ylab="Residuals",main="Binned Residuals vs. Aces")
+
+binnedplot(ten$df, ten$Residuals,xlab="Double Faults",
+           ylab="Residuals",main="Binned Residuals vs. Double Faults")
+
+binnedplot(ten$bpSaved, ten$Residuals,xlab="Saved break points",
+           ylab="Residuals",main="Binned Residuals vs. Saved break points")
+```
+
+```{r}
+ROC.ten <- roc(ten$status,ten$Predicted,plot=T)
+```
+
+```{r}
+ROC.ten$auc
+```
+
+```{r}
+threshold = 0.30
+table(ten$status, ten$Predicted > threshold)
+```
+
+```{r}
+(338 + 13)/(14+13+338+635)
 ```
 
 
 # Prediction
+
+Test cases: 
+
+```{r}
+
+```
+
 
 # Conclusion
 
