@@ -3,8 +3,8 @@ title: "Project"
 author: "Steven Herrera and Ethan Shen"
 date: "11/09/2018"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r load-packages, message=FALSE}
@@ -178,7 +178,7 @@ glimpse(ten)
 
 # Exploratory Data Analysis 
 
-To begin our exploratory data analysis, we will examine a matrix plot of the variables in our dataset to consider multicollinearity.
+To begin our exploratory data analysis, we will examine a matrix plot of the variables in our dataset to consider multicollinearity and large leverage of certain observations.
 
 ## Matrix Plot
 ```{r fig.height=11, fig.width=11}
@@ -190,6 +190,85 @@ pairs(status ~ minutes + ht + age + rank + rankpoints + ace +
         SvGms + bpSaved + bpFaced, data=ten, pch = 16,
       main = "Matrix of scatterplots for Tournament Wins and Variables")
 ```
+
+Immediately, we noticed that there was an observation that made the minutes variable plots look skewed. We examined it below:
+
+```{r}
+ten %>%
+  arrange(desc(minutes)) %>%
+  select(minutes)
+```
+
+Confirming on the following website: https://en.wikipedia.org/wiki/2016_Apia_International_Sydney_–_Men%27s_Singles we found that Jeremy Chardy did not in fact play a match that last 1,146 minutes. Therefore, we will consider removing the observation.
+
+```{r fig.height=11, fig.width=11}
+ten <- ten %>%
+  subset(minutes != 1146)
+
+pairs(status ~ minutes + ht + age + rank + rankpoints + ace +
+        df + svpt + firsstIn + firsttWon + secondndWon + 
+        SvGms + bpSaved + bpFaced, data=ten, pch = 16,
+      main = "Matrix of scatterplots for Tournament Wins and Variables")
+```
+
+Looking at the matrix plot, we will already consider removing the following favirables because of multicollinearity: `svpt`, `firsstIn`, `firsttWon`, `secondndWon`, `SvGms`, and `bpFaced`.
+
+We will now look at box plots of the numeric variables we will include in our full model:
+
+```{r fig.height=10, fig.width=8, message=FALSE}
+p1 <- ggplot(data=ten,aes(x=status,y=minutes)) +
+  geom_boxplot() + 
+  labs(title="Minutes by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Minutes")
+p2 <- ggplot(data=ten,aes(x=status,y=ht)) +
+  geom_boxplot() + 
+  labs(title="Height by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Height")
+p3 <- ggplot(data=ten,aes(x=status,y=age)) +
+  geom_boxplot() + 
+  labs(title="Age by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Age (years)")
+p4 <- ggplot(data=ten,aes(x=status,y=rank)) +
+  geom_boxplot() + 
+  labs(title="Ranking by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Rank")
+p5 <- ggplot(data=ten,aes(x=status,y=rankpoints)) +
+  geom_boxplot() + 
+  labs(title="Rankpoints by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Rankpoints")
+p6 <- ggplot(data=ten,aes(x=status,y=ace)) +
+  geom_boxplot() + 
+  labs(title="Aces by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Aces")
+p7 <- ggplot(data=ten,aes(x=status,y=df)) +
+  geom_boxplot() + 
+  labs(title="Double Faults by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Double Faults")
+p8 <- ggplot(data=ten,aes(x=status,y=bpSaved)) +
+  geom_boxplot() + 
+  labs(title="Saved Breakpoints by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Saved Breakpoints")
+
+plot_grid(p1,p2,p3,p4,p5,
+          p6,p7,p8,ncol=2)
+```
+
+And we will include a stacked bar graph for the variable `surface`.
+
+```{r}
+ggplot(data=ten,aes(x=surface)) + geom_bar(aes(fill=status)) + 
+  labs(title="Status vs. Surface")
+```
+
+In looking at all of these observations, it seems like the medians of the numeric distributions do not seem to differ that much by status of winning or losing. The same can be said about the proportions of winning and losing matches against all three surfaces. In creating our model, it could be difficult to see which variables could be helpful in differentiating between whether a player will win a match or not. But, we hope to see that a combination of these variables will be helpful in determining a model that best predicts the percentage of winning a match.
 
 # Logistic Regression Model
 
