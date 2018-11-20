@@ -224,7 +224,7 @@ plot_grid(p1,p2,p3,p4,p5,
 And we will include a stacked bar graph for the variable `surface`.
 
 ```{r}
-ggplot(data=ten,aes(x=surface)) + geom_bar(aes(fill=status)) + 
+ggplot(data=ten,aes(x=surface, fill = status)) + geom_bar(position = "fill") + 
   labs(title="Status vs. Surface")
 ```
 
@@ -311,6 +311,56 @@ table(ten$status, ten$Predicted > threshold)
 ## Test cases: 
 
 ```{r}
+ten %>%
+  filter(tourney_name == "Monte Carlo Masters",
+         winner_name == "Roger Federer",
+         loser_name == "Novak Djokovic")
+
+tidy(final.base.model)
+
+```
+
+
+
+
+```{r}
+x0 = data.frame(minutes = 75, ht = 188, rankpoints = 11689 , ace =2 , df = 0, bpSaved = 2, surface = "Hard")
+predict.glm(final.base.model,x0,interval="response")
+
+```
+
+
+```{r}
+newdata <- ten %>%
+  filter(tourney_name == "Monte Carlo Masters",
+         winner_name == "Roger Federer")
+predict.glm(final.base.model, newdata=newdata, type="response")
+
+```
+
+```{r}
+dfdf <- tennis %>%
+  filter(tourney_name == "Monte Carlo Masters",
+       winner_name == "Roger Federer",
+       tourney_id == "2014-410",
+       name == "Novak Djokovic")
+
+dfd <- tennis %>%
+   filter(tourney_name == "Monte Carlo Masters",
+         tourney_id == "2014-410")
+
+fed <- data.frame(minutes = 75, ht = 185, rankpoints = 5355 , ace =3 , df = 1, bpSaved = 2, surface = "Hard")
+djo <- data.frame(minutes = 75, ht = 188, rankpoints = 11680, ace = 2, df = 0, bpSaved = 2, surface = "Hard")
+predict.glm(final.base.model, newdata=fed, type="response")
+predict.glm(final.base.model, newdata=djo, type="response")
+```
+
+```{r}
+ddd <- ten %>%
+  filter(name == "Roger Federer",
+         winner_name == "Roger Federer")
+ddd
+predict.glm(final.base.model, newdata=ddd, type="response")
 
 ```
 
