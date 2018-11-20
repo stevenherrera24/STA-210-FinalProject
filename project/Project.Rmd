@@ -14,6 +14,7 @@ library(cowplot)
 library(car)
 library(broom)
 library(knitr)
+library(arm)
 ```
 
 ```{r message=FALSE, include=FALSE}
@@ -272,19 +273,36 @@ In looking at all of these observations, it seems like the medians of the numeri
 
 # Logistic Regression Model
 
-To begin our regression models, we will
+To begin our regression models, we will use all of the variables we deemed important from our exploratory data analysis.
 
 ```{r}
+full.model <- glm(status ~ minutes + ht + age + rank + 
+                rankpoints + ace + df + bpSaved + surface, 
+                family=binomial,data=ten)
+kable(tidy(full.model), format="markdown", digits = 3)
+```
 
+
+```{r}
+model.selected <- step(full.model,direction="backward")
 ```
 
 ```{r}
-#backwards <- ols_step_backward_aic(fullmodel)
+kable(tidy(model.selected), format = "markdown", digits = 3)
 ```
 
+```{r}
+final.base.model <- glm(status ~ ht + rankpoints +
+                        ace + df + bpSaved + surface,
+                        family=binomial, data=ten)
+kable(tidy(final.base.model), format = "markdown", digits = 3)
+```
 
+Interaction effects?
 
 # Model Assessment
+
+
 
 # Prediction
 
