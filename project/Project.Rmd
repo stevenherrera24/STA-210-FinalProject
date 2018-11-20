@@ -29,40 +29,33 @@ atp2010 <- read_csv("files/atp2010.csv")
 atp1 <- atp %>%
   filter(tourney_date < 20171113)
 
-winners2017 <- atp1 %>%
-  filter(round == "F")
-
 winners2016 <- atp2016 %>%
-  filter(tourney_date < 20161114) %>%
-  filter(round == "F")
+  filter(tourney_date < 20161114)
 
 winners2015 <- atp2015 %>%
-  filter(tourney_date < 20151115) %>%
-  filter(round == "F")
+  filter(tourney_date < 20151115) 
 
 winners2014 <- atp2014 %>%
-  filter(tourney_date < 20141109) %>%
-  filter(round == "F")
+  filter(tourney_date < 20141109) 
 
 winners2013 <- atp2013 %>%
-  filter(tourney_date < 20131104) %>%
-  filter(round == "F")
+  filter(tourney_date < 20131104) 
 
 winners2012 <- atp2012 %>%
-  filter(tourney_date < 20121105) %>%
-  filter(round == "F")
+  filter(tourney_date < 20121105) 
 
 winners2011 <- atp2011 %>%
-  filter(tourney_date < 20111114) %>%
-  filter(round == "F")
+  filter(tourney_date < 20111114) 
 
 winners2010 <- atp2010 %>%
-  filter(tourney_date < 20101121) %>%
-  filter(round == "F")
+  filter(tourney_date < 20101121) 
 
 winners <- rbind(winners2017, winners2016, winners2015, winners2014, winners2013, 
                  winners2012, winners2011, winners2010)
+```
 
+
+```{r}
 winners_set <- winners %>%
   filter(best_of == 3,
          !is.na(w_ace), 
@@ -73,7 +66,65 @@ winners_set <- winners %>%
          !is.na(w_2ndWon),
          !is.na(w_SvGms), 
          !is.na(w_bpSaved),
-         !is.na(w_bpFaced)) %>%
+         !is.na(w_bpFaced))
+```
+
+```{r}
+winners <- winners_set %>%
+  mutate(seed = winner_seed,
+         name = winner_name,
+         hand = winner_hand,
+         ht = winner_ht,
+         age = winner_age,
+         rank = winner_rank,
+         rankpoints = winner_rank_points,
+         ace = w_ace,
+         df = w_df,
+         svpt = w_svpt,
+         firsstIn = w_1stIn,
+         firsttWon = w_1stWon,
+         secondndWon = w_2ndWon,
+         SvGms = w_SvGms,
+         bpSaved = w_bpSaved,
+         bpFaced = w_bpFaced,
+         minutes = minutes,
+         winner = "winner"
+         )
+
+
+losers <- winners_set %>%
+  mutate(seed = loser_seed,
+         name = loser_name,
+         hand = loser_hand,
+         ht = loser_ht,
+         age = loser_age,
+         rank = loser_rank,
+         rankpoints = loser_rank_points,
+         ace = l_ace,
+         df = l_df,
+         svpt = l_svpt,
+         firsstIn = l_1stIn,
+         firsttWon = l_1stWon,
+         secondndWon = l_2ndWon,
+         SvGms = l_SvGms,
+         bpSaved = l_bpSaved,
+         bpFaced = l_bpFaced,
+         minutes = minutes,
+         winner = "loser"
+         )
+
+
+
+asdf <- rbind(winners,losers)
+```
+
+```{r}
+asdf
+```
+
+
+
+%>%
   group_by(winner_name) %>%
   mutate(mean_w_ace = mean(w_ace),
          mean_w_df = mean(w_df),
@@ -87,14 +138,63 @@ winners_set <- winners %>%
          mean_minutes = mean(minutes),
          num = n())
 
-myvars <- names(winners_set) %in% c("loser_id", "loser_seed", "loser_entry", "loser_name",
+myvars <- names(winners_set) %in% c( "loser_seed", "loser_entry", "loser_name",
                              "loser_hand", "loser_ht", "loser_ioc", "loser_age", 
                              "loser_rank", "loser_rank_points", "l_ace", "l_df", 
                              "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", 
                              "l_bpSaved", "l_bpFaced") 
+#loser_id
 winners_set <- winners_set[!myvars]
+
+
+```{r}
+winners_set
+
+grass <- winners_set %>%
+  filter(surface == "Grass") 
+
+myvars <- names(grass) %in% c("loser_id", "winner_id")
+
+grass <- grass[myvars]
+
+grass 
+
 ```
 
+
+
+```{r}
+winnergrass <- grass %>%
+    mutate(id = winner_id)
+
+
+myvars <- names(winnergrass) %in% c("loser_id", "winner_id")
+
+winnergrass <- winnergrass[!myvars]
+
+
+winnergrass
+
+
+losergrass <- grass %>%
+  mutate(id = loser_id)
+
+
+myvars <- names(losergrass) %in% c("loser_id", "winner_id")
+
+losergrass <- losergrass[!myvars]
+
+losergrass
+
+
+total <- rbind(winnergrass, losergrass)
+total
+
+```
+
+```{r}
+
+```
 
 # Exploratory Data Analysis 
 
