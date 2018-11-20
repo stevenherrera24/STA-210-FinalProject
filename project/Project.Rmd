@@ -14,6 +14,10 @@ library(cowplot)
 library(car)
 library(broom)
 library(knitr)
+library(arm)
+library(tidyr)
+library(pROC)
+library(arm)
 ```
 
 ```{r message=FALSE, include=FALSE}
@@ -50,12 +54,9 @@ winners2011 <- atp2011 %>%
 winners2010 <- atp2010 %>%
   filter(tourney_date < 20101121) 
 
-winners <- rbind(winners2017, winners2016, winners2015, winners2014, winners2013, 
+winners <- rbind(atp1, winners2016, winners2015, winners2014, winners2013, 
                  winners2012, winners2011, winners2010)
-```
 
-
-```{r}
 winners_set <- winners %>%
   filter(best_of == 3,
          !is.na(w_ace), 
@@ -66,31 +67,8 @@ winners_set <- winners %>%
          !is.na(w_2ndWon),
          !is.na(w_SvGms), 
          !is.na(w_bpSaved),
-         !is.na(w_bpFaced))
-```
-
-```{r}
-winners <- winners_set %>%
-  mutate(seed = winner_seed,
-         name = winner_name,
-         hand = winner_hand,
-         ht = winner_ht,
-         age = winner_age,
-         rank = winner_rank,
-         rankpoints = winner_rank_points,
-         ace = w_ace,
-         df = w_df,
-         svpt = w_svpt,
-         firsstIn = w_1stIn,
-         firsttWon = w_1stWon,
-         secondndWon = w_2ndWon,
-         SvGms = w_SvGms,
-         bpSaved = w_bpSaved,
-         bpFaced = w_bpFaced,
-         minutes = minutes,
-         status = "winner"
-         )
-
+         !is.na(w_bpFaced),
+         surface!="None")
 
 losers <- winners_set %>%
   mutate(seed = loser_seed,
@@ -110,62 +88,232 @@ losers <- winners_set %>%
          bpSaved = l_bpSaved,
          bpFaced = l_bpFaced,
          minutes = minutes,
-         status = "loser"
-         )
+         status = 0
+         )  
+  
+
+winners <- winners_set %>%
+  mutate(seed = winner_seed,
+         name = winner_name,
+         hand = winner_hand,
+         ht = winner_ht,
+         age = winner_age,
+         rank = winner_rank,
+         rankpoints = winner_rank_points,
+         ace = w_ace,
+         df = w_df,
+         svpt = w_svpt,
+         firsstIn = w_1stIn,
+         firsttWon = w_1stWon,
+         secondndWon = w_2ndWon,
+         SvGms = w_SvGms,
+         bpSaved = w_bpSaved,
+         bpFaced = w_bpFaced,
+         minutes = minutes,
+         status = 1
+         ) 
 
 tennis <- rbind(winners,losers)
+tennis <- tennis %>%
+  filter(!is.na(seed),
+         !is.na(name),
+         !is.na(hand),
+         !is.na(ht),
+         !is.na(age),
+         !is.na(rank),
+         !is.na(rankpoints),
+         !is.na(ace),
+         !is.na(df),
+         !is.na(svpt),
+         !is.na(firsstIn),
+         !is.na(firsttWon),
+         !is.na(secondndWon),
+         !is.na(SvGms),
+         !is.na(bpSaved),
+         !is.na(bpFaced),
+         !is.na(minutes),
+         !is.na(status))
 ```
+
+# Data 
+
+Using data manipulation skills in R, we shaped the dataset to show each observation as the outcome of the match for the winner and the loser of each match from 2010-2017. Below, is a glimpse of our dataset.
 
 ```{r}
 glimpse(tennis)
 ```
 
+Because we have 11,037 observations, we will randomly select observations to be included in a smaller dataset so that we can effectively examine exploratory data analysis. Below, is our code on how we randomly selected the observations in our new dataset.
+
 ```{r}
-tennis <- tennis %>%
-  mutate(status = case_when(
-    status == "winner" ~ 1,
-    status == "loser" ~ 0
-  ))
+set.seed(1234)
+ten <- tennis %>% sample_n(1000)
+```
 
+Here is what our new dataset looks like:
 
-model <- glm(status ~ round + minutes,data = tennis)
-tidy(model)
+```{r}
+glimpse(ten)
 ```
 
 # Exploratory Data Analysis 
 
-To begin our exploratory data analysis, we will examine the matrix plots for all three court surfaces, with the response variable being `num` and all other variables we deemed important in our proposal.
+To begin our exploratory data analysis, we will examine a matrix plot of the variables in our dataset to consider multicollinearity and large leverage of certain observations.
 
 ## Matrix Plot
 ```{r fig.height=11, fig.width=11}
-pairs(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
-        mean_w_df + mean_w_svpt + mean_w_1stIn + mean_w_1stWon + 
-        mean_w_2ndWon + mean_w_SvGms + mean_w_bpSaved + mean_w_bpFaced + 
-        mean_minutes, data=winners_set, pch = 16,
+ten <- ten %>%
+  mutate(status = as.factor(status)) 
+
+pairs(status ~ minutes + ht + age + rank + rankpoints + ace +
+        df + svpt + firsstIn + firsttWon + secondndWon + 
+        SvGms + bpSaved + bpFaced, data=ten, pch = 16,
       main = "Matrix of scatterplots for Tournament Wins and Variables")
 ```
-# Linear Regression
 
-To begin our regression models, we will
+Looking at the matrix plot, we will already consider removing the following favirables because of multicollinearity: `svpt`, `firsstIn`, `firsttWon`, `secondndWon`, `SvGms`, and `bpFaced`.
 
-```{r}
-fullmodel <- lm(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
-        mean_w_df + mean_w_svpt + mean_w_bpSaved + surface, data=winners_set)
-tidy(fullmodel)
+We will now look at box plots of the numeric variables we will include in our full model:
+
+```{r fig.height=10, fig.width=8, message=FALSE}
+p1 <- ggplot(data=ten,aes(x=status,y=minutes)) +
+  geom_boxplot() + 
+  labs(title="Minutes by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Minutes")
+p2 <- ggplot(data=ten,aes(x=status,y=ht)) +
+  geom_boxplot() + 
+  labs(title="Height by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Height")
+p3 <- ggplot(data=ten,aes(x=status,y=age)) +
+  geom_boxplot() + 
+  labs(title="Age by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Age (years)")
+p4 <- ggplot(data=ten,aes(x=status,y=rank)) +
+  geom_boxplot() + 
+  labs(title="Ranking by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Rank")
+p5 <- ggplot(data=ten,aes(x=status,y=rankpoints)) +
+  geom_boxplot() + 
+  labs(title="Rankpoints by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Rankpoints")
+p6 <- ggplot(data=ten,aes(x=status,y=ace)) +
+  geom_boxplot() + 
+  labs(title="Aces by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Aces")
+p7 <- ggplot(data=ten,aes(x=status,y=df)) +
+  geom_boxplot() + 
+  labs(title="Double Faults by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Double Faults")
+p8 <- ggplot(data=ten,aes(x=status,y=bpSaved)) +
+  geom_boxplot() + 
+  labs(title="Saved Breakpoints by Status",
+       x = "0 if Lost, 1 if Won",
+       y = "Saved Breakpoints")
+
+plot_grid(p1,p2,p3,p4,p5,
+          p6,p7,p8,ncol=2)
 ```
 
+And we will include a stacked bar graph for the variable `surface`.
+
 ```{r}
-backwards <- ols_step_backward_aic(fullmodel)
+ggplot(data=ten,aes(x=surface)) + geom_bar(aes(fill=status)) + 
+  labs(title="Status vs. Surface")
 ```
 
-```{r fig.height=11, fig.width=11}
-pairs(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
-        mean_w_df + mean_w_svpt + mean_w_bpSaved, data=winners_set, pch = 16)
+In looking at all of these observations, it seems like the medians of the numeric distributions do not seem to differ that much by status of winning or losing. The same can be said about the proportions of winning and losing matches against all three surfaces. In creating our model, it could be difficult to see which variables could be helpful in differentiating between whether a player will win a match or not. But, we hope to see that a combination of these variables will be helpful in determining a model that best predicts the percentage of winning a match.
+
+# Logistic Regression Model
+
+To begin our regression models, we will use all of the variables we deemed important from our exploratory data analysis.
+
+```{r}
+full_model <- glm(status ~ minutes + ht + age + rank + 
+                rankpoints + ace + df + bpSaved + surface, 
+                family=binomial,data=ten)
+kable(tidy(full_model), format="markdown", digits = 3)
+```
+
+
+```{r}
+model.selected <- step(full_model,direction="backward")
 ```
 
 # Linear Regression Assumptions
 
-# Hypothesis Tests + Confidence Intervals
+```{r}
+kable(tidy(model.selected), format = "markdown", digits = 3)
+```
+
+```{r}
+final.base.model <- model.selected
+kable(tidy(final.base.model), format = "markdown", digits = 3)
+```
+
+Interaction effects?
+
+# Model Assessment
+
+## Binned Plots with Residuals vs Predicted
+
+```{r}
+ten <- ten %>% mutate(Residuals = residuals.glm(final.base.model,type="response"),
+                          Predicted = predict.glm(final.base.model,type="response"))
+
+binnedplot(ten$Predicted, ten$Residuals,xlab="Predicted Probabilities",
+           ylab="Residuals",main="Binned Residuals vs. Predicted Probabilities")
+```
+
+```{r,fig.height=4,fig.width=4,echo=F}
+binnedplot(ten$minutes, ten$Residuals,xlab="Minutes",
+           ylab="Residuals",main="Binned Residuals vs. Minutes")
+
+binnedplot(ten$ht, ten$Residuals,xlab="Height",
+           ylab="Residuals",main="Binned Residuals vs. Height")
+
+binnedplot(ten$ace, ten$Residuals,xlab="Aces",
+           ylab="Residuals",main="Binned Residuals vs. Aces")
+
+binnedplot(ten$df, ten$Residuals,xlab="Double Faults",
+           ylab="Residuals",main="Binned Residuals vs. Double Faults")
+
+binnedplot(ten$bpSaved, ten$Residuals,xlab="Saved break points",
+           ylab="Residuals",main="Binned Residuals vs. Saved break points")
+```
+
+```{r}
+ROC.ten <- roc(ten$status,ten$Predicted,plot=T)
+```
+
+```{r}
+ROC.ten$auc
+```
+
+```{r}
+threshold = 0.30
+table(ten$status, ten$Predicted > threshold)
+```
+
+```{r}
+(338 + 13)/(14+13+338+635)
+```
+
+
+# Prediction
+
+## Test cases: 
+
+```{r}
+
+```
+
 
 # Conclusion
 
