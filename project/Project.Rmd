@@ -112,8 +112,8 @@ winners <- winners_set %>%
          minutes = minutes,
          status = 1
          ) 
-
 tennis <- rbind(winners,losers)
+
 tennis <- tennis %>%
   filter(!is.na(seed),
          !is.na(name),
@@ -310,60 +310,64 @@ table(ten$status, ten$Predicted > threshold)
 
 ## Test cases: 
 
+We will look at a match that was played the Monte Carlo Masters in 2014 between Roger Federer and Novak Djokovic. We want to see the percentage that a player will win the match. 
+
 ```{r}
 ten %>%
   filter(tourney_name == "Monte Carlo Masters",
-         winner_name == "Roger Federer",
+         name == "Roger Federer" |  name == "Novak Djokovic",
+         tourney_id == "2014-410",
          loser_name == "Novak Djokovic")
-
-tidy(final.base.model)
-
-```
-
-
-
-
-```{r}
-x0 = data.frame(minutes = 75, ht = 188, rankpoints = 11689 , ace =2 , df = 0, bpSaved = 2, surface = "Hard")
-predict.glm(final.base.model,x0,interval="response")
-
-```
-
-
-```{r}
-newdata <- ten %>%
-  filter(tourney_name == "Monte Carlo Masters",
-         winner_name == "Roger Federer")
-predict.glm(final.base.model, newdata=newdata, type="response")
-
 ```
 
 ```{r}
-dfdf <- tennis %>%
-  filter(tourney_name == "Monte Carlo Masters",
-       winner_name == "Roger Federer",
-       tourney_id == "2014-410",
-       name == "Novak Djokovic")
-
-dfd <- tennis %>%
-   filter(tourney_name == "Monte Carlo Masters",
-         tourney_id == "2014-410")
-
-fed <- data.frame(minutes = 75, ht = 185, rankpoints = 5355 , ace =3 , df = 1, bpSaved = 2, surface = "Hard")
-djo <- data.frame(minutes = 75, ht = 188, rankpoints = 11680, ace = 2, df = 0, bpSaved = 2, surface = "Hard")
+fed <- data.frame(minutes = 75, ht = 185, rankpoints = 5355 , ace = 3 , df = 1, bpSaved = 2, surface = "Hard")
+djo1 <- data.frame(minutes = 75, ht = 188, rankpoints = 11680, ace = 2, df = 0, bpSaved = 2, surface = "Hard")
 predict.glm(final.base.model, newdata=fed, type="response")
-predict.glm(final.base.model, newdata=djo, type="response")
+predict.glm(final.base.model, newdata=djo1, type="response")
+```
+
+We see that the model predicts Roger Federer has a 76.7% chance of winning the match, while Novak Djokovic has a 91.38% chance of winning the match. This is mainly Djokovic's rank points were almost double that of Federer's. However, Federer won the match. 
+
+The the next match we will look at was played at the China Open in 2013 and was between Novak Djokovic and Rafael Nadal.
+
+```{r}
+tennis %>%
+  filter(name == "Novak Djokovic" | name == "Rafael Nadal",
+         tourney_name == "Beijing",
+         loser_name == "Rafael Nadal",
+         tourney_id == "2013-747")
+
+```
+```{r}
+djo2 <- data.frame(minutes = 87, ht = 188, rankpoints = 11120, ace = 5, df = 1, bpSaved = 0, surface = "Hard")
+nadal <- data.frame(minutes = 87, ht = 185, rankpoints = 10860, ace = 2, df = 2, bpSaved = 2, surface = "Hard")
+predict.glm(final.base.model, newdata=djo2, type="response")
+predict.glm(final.base.model, newdata=nadal, type="response")
+```
+We see that the model predicts Novak Djokovic has a 92.5% chance of winning the match, while Rafael Nadal has a 87.19% chance of winning the match. 
+
+### Test Case with Similar Rank Points 
+
+Now, we'll look at a match where both players had similar stats, especially rank points. The match we will look at is between Jo Wilfried Tsonga and Michael Llodra, and was played at the Queen's Club Championships in 2011. 
+
+```{r}
+ten %>%
+  filter(winner_rank_points > 1000 & winner_rank_points < 2000 & loser_rank_points > 1000 & loser_rank_points < 2000,
+         tourney_id == "2011-311",
+         tourney_name == "Queen's Club",
+         winner_name == "Jo Wilfried Tsonga"
+         )
 ```
 
 ```{r}
-ddd <- ten %>%
-  filter(name == "Roger Federer",
-         winner_name == "Roger Federer")
-ddd
-predict.glm(final.base.model, newdata=ddd, type="response")
-
+jo <- data.frame(minutes = 23, ht = 188, rankpoints = 1480, ace = 2, df = 1, bpSaved = 0, surface = "Grass")
+llodra <- data.frame(minutes = 23, ht = 190, rankpoints = 1400, ace = 0, df = 0, bpSaved = 0, surface = "Grass")
+predict.glm(final.base.model, newdata=jo, type="response")
+predict.glm(final.base.model, newdata=llodra, type="response")
 ```
 
+We see that the model predicts Jo Wilfried Tsonga has a 66.59% of chance of winning the match, while Michael Llodra has a 63.19% chance of winning the match. These percentages are slightly lower because their rankpoints are significantly lower than those of Nadal's or Djokovic's. 
 
 # Conclusion
 
