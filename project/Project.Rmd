@@ -50,7 +50,7 @@ winners2011 <- atp2011 %>%
 winners2010 <- atp2010 %>%
   filter(tourney_date < 20101121) 
 
-winners <- rbind(winners2017, winners2016, winners2015, winners2014, winners2013, 
+winners <- rbind(atp1, winners2016, winners2015, winners2014, winners2013, 
                  winners2012, winners2011, winners2010)
 
 winners_set <- winners %>%
@@ -196,19 +196,13 @@ pairs(status ~ minutes + ht + age + rank + rankpoints + ace +
 To begin our regression models, we will
 
 ```{r}
-fullmodel <- lm(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
-        mean_w_df + mean_w_svpt + mean_w_bpSaved + surface, data=winners_set)
-tidy(fullmodel)
+
 ```
 
 ```{r}
-backwards <- ols_step_backward_aic(fullmodel)
+#backwards <- ols_step_backward_aic(fullmodel)
 ```
 
-```{r fig.height=11, fig.width=11}
-pairs(num ~ winner_seed + winner_ht + winner_age + winner_rank + 
-        mean_w_df + mean_w_svpt + mean_w_bpSaved, data=winners_set, pch = 16)
-```
 
 
 # Model Assessment
