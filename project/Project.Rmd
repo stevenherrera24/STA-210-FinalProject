@@ -66,26 +66,26 @@ winners_set <- winners %>%
          !is.na(w_bpSaved),
          !is.na(w_bpFaced))
 
-winners <- winners_set %>%
-  mutate(seed = winner_seed,
-         name = winner_name,
-         hand = winner_hand,
-         ht = winner_ht,
-         age = winner_age,
-         rank = winner_rank,
-         rankpoints = winner_rank_points,
-         ace = w_ace,
-         df = w_df,
-         svpt = w_svpt,
-         firsstIn = w_1stIn,
-         firsttWon = w_1stWon,
-         secondndWon = w_2ndWon,
-         SvGms = w_SvGms,
-         bpSaved = w_bpSaved,
-         bpFaced = w_bpFaced,
+losers <- winners_set %>%
+  mutate(seed = loser_seed,
+         name = loser_name,
+         hand = loser_hand,
+         ht = loser_ht,
+         age = loser_age,
+         rank = loser_rank,
+         rankpoints = loser_rank_points,
+         ace = l_ace,
+         df = l_df,
+         svpt = l_svpt,
+         firsstIn = l_1stIn,
+         firsttWon = l_1stWon,
+         secondndWon = l_2ndWon,
+         SvGms = l_SvGms,
+         bpSaved = l_bpSaved,
+         bpFaced = l_bpFaced,
          minutes = minutes,
-         status = 1
-         ) %>%
+         status = 0
+         )  %>%
   select(tourney_id,
          tourney_name,
          surface,
@@ -108,27 +108,27 @@ winners <- winners_set %>%
          bpSaved,
          bpFaced,
          status)
+  
 
-
-losers <- winners_set %>%
-  mutate(seed = loser_seed,
-         name = loser_name,
-         hand = loser_hand,
-         ht = loser_ht,
-         age = loser_age,
-         rank = loser_rank,
-         rankpoints = loser_rank_points,
-         ace = l_ace,
-         df = l_df,
-         svpt = l_svpt,
-         firsstIn = l_1stIn,
-         firsttWon = l_1stWon,
-         secondndWon = l_2ndWon,
-         SvGms = l_SvGms,
-         bpSaved = l_bpSaved,
-         bpFaced = l_bpFaced,
+winners <- winners_set %>%
+  mutate(seed = winner_seed,
+         name = winner_name,
+         hand = winner_hand,
+         ht = winner_ht,
+         age = winner_age,
+         rank = winner_rank,
+         rankpoints = winner_rank_points,
+         ace = w_ace,
+         df = w_df,
+         svpt = w_svpt,
+         firsstIn = w_1stIn,
+         firsttWon = w_1stWon,
+         secondndWon = w_2ndWon,
+         SvGms = w_SvGms,
+         bpSaved = w_bpSaved,
+         bpFaced = w_bpFaced,
          minutes = minutes,
-         status = 0
+         status = 1
          ) %>%
   select(tourney_id,
          tourney_name,
@@ -302,6 +302,15 @@ Interaction effects?
 
 # Model Assessment
 
+Binned Plots with Residuals vs Predicted
+
+```{r}
+ten %>%
+  mutate(predicted = predict.glm(final.base.model,type="response"),
+         residuals = residuals.glm(final.base.model,type="response"))
+
+binnedplot(x=ten$predicted,y=ten$residuals,xlab="Predicted")
+```
 
 
 # Prediction
