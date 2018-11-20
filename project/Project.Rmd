@@ -88,7 +88,7 @@ winners <- winners_set %>%
          bpSaved = w_bpSaved,
          bpFaced = w_bpFaced,
          minutes = minutes,
-         winner = "winner"
+         status = "winner"
          )
 
 
@@ -110,90 +110,14 @@ losers <- winners_set %>%
          bpSaved = l_bpSaved,
          bpFaced = l_bpFaced,
          minutes = minutes,
-         winner = "loser"
+         status = "loser"
          )
 
-
-
-asdf <- rbind(winners,losers)
+tennis <- rbind(winners,losers)
 ```
 
 ```{r}
-asdf
-```
-
-
-
-%>%
-  group_by(winner_name) %>%
-  mutate(mean_w_ace = mean(w_ace),
-         mean_w_df = mean(w_df),
-         mean_w_svpt = mean(w_svpt),
-         mean_w_1stIn = mean(w_1stIn),
-         mean_w_1stWon = mean(w_1stWon),
-         mean_w_2ndWon = mean(w_2ndWon),
-         mean_w_SvGms = mean(w_SvGms),
-         mean_w_bpSaved = mean(w_bpSaved),
-         mean_w_bpFaced = mean(w_bpFaced),
-         mean_minutes = mean(minutes),
-         num = n())
-
-myvars <- names(winners_set) %in% c( "loser_seed", "loser_entry", "loser_name",
-                             "loser_hand", "loser_ht", "loser_ioc", "loser_age", 
-                             "loser_rank", "loser_rank_points", "l_ace", "l_df", 
-                             "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", 
-                             "l_bpSaved", "l_bpFaced") 
-#loser_id
-winners_set <- winners_set[!myvars]
-
-
-```{r}
-winners_set
-
-grass <- winners_set %>%
-  filter(surface == "Grass") 
-
-myvars <- names(grass) %in% c("loser_id", "winner_id")
-
-grass <- grass[myvars]
-
-grass 
-
-```
-
-
-
-```{r}
-winnergrass <- grass %>%
-    mutate(id = winner_id)
-
-
-myvars <- names(winnergrass) %in% c("loser_id", "winner_id")
-
-winnergrass <- winnergrass[!myvars]
-
-
-winnergrass
-
-
-losergrass <- grass %>%
-  mutate(id = loser_id)
-
-
-myvars <- names(losergrass) %in% c("loser_id", "winner_id")
-
-losergrass <- losergrass[!myvars]
-
-losergrass
-
-
-total <- rbind(winnergrass, losergrass)
-total
-
-```
-
-```{r}
-
+glimpse(tennis)
 ```
 
 # Exploratory Data Analysis 
