@@ -18,6 +18,7 @@ library(arm)
 library(tidyr)
 library(pROC)
 library(arm)
+library(rlm)
 ```
 
 ```{r message=FALSE, include=FALSE}
@@ -239,25 +240,36 @@ full_model <- glm(status ~ minutes + ht + age + rank +
                 rankpoints + ace + df + bpSaved + surface, 
                 family=binomial,data=ten)
 kable(tidy(full_model), format="markdown", digits = 3)
+
+```
+
+```{r}
+full_w_interactions <- glm(status ~ minutes + ht + age + rank + 
+                rankpoints + ace + df + bpSaved + surface + surface * ace + surface * ht + surface*df, 
+                family=binomial,data=ten)
+```
+
+```{r}
+AIC(full_model)
+AIC(full_w_interactions)
 ```
 
 
 ```{r}
-model.selected <- step(full_model,direction="backward")
+model.selected.interactions <- step(full_w_interactions,direction="backward")
 ```
 
 # Linear Regression Assumptions
 
 ```{r}
-kable(tidy(model.selected), format = "markdown", digits = 3)
+kable(tidy(model.selected.interactions), format = "markdown", digits = 3)
 ```
 
 ```{r}
-final.base.model <- model.selected
+final.base.model <- model.selected.interactions
 kable(tidy(final.base.model), format = "markdown", digits = 3)
 ```
 
-Interaction effects?
 
 # Model Assessment
 
@@ -327,7 +339,7 @@ predict.glm(final.base.model, newdata=fed, type="response")
 predict.glm(final.base.model, newdata=djo1, type="response")
 ```
 
-We see that the model predicts Roger Federer has a 76.7% chance of winning the match, while Novak Djokovic has a 91.38% chance of winning the match. This is mainly Djokovic's rank points were almost double that of Federer's. However, Federer won the match. 
+We see that the model predicts Roger Federer has a 77.54% chance of winning the match, while Novak Djokovic has a 92.43% chance of winning the match. This is mainly Djokovic's rank points were almost double that of Federer's. However, Federer won the match. 
 
 The the next match we will look at was played at the China Open in 2013 and was between Novak Djokovic and Rafael Nadal.
 
@@ -345,11 +357,11 @@ nadal <- data.frame(minutes = 87, ht = 185, rankpoints = 10860, ace = 2, df = 2,
 predict.glm(final.base.model, newdata=djo2, type="response")
 predict.glm(final.base.model, newdata=nadal, type="response")
 ```
-We see that the model predicts Novak Djokovic has a 92.5% chance of winning the match, while Rafael Nadal has a 87.19% chance of winning the match. 
+We see that the model predicts Novak Djokovic has a 92.95% chance of winning the match, while Rafael Nadal has a 88.09% chance of winning the match. Djokovic won the match. 
 
 ### Test Case with Similar Rank Points 
 
-Now, we'll look at a match where both players had similar stats, especially rank points. The match we will look at is between Jo Wilfried Tsonga and Michael Llodra, and was played at the Queen's Club Championships in 2011. 
+Now, we'll look at a match where both players had similar rank points. The match we will look at is between Jo Wilfried Tsonga and Michael Llodra, and was played at the Queen's Club Championships in 2011. 
 
 ```{r}
 ten %>%
@@ -367,7 +379,7 @@ predict.glm(final.base.model, newdata=jo, type="response")
 predict.glm(final.base.model, newdata=llodra, type="response")
 ```
 
-We see that the model predicts Jo Wilfried Tsonga has a 66.59% of chance of winning the match, while Michael Llodra has a 63.19% chance of winning the match. These percentages are slightly lower because their rankpoints are significantly lower than those of Nadal's or Djokovic's. 
+We see that the model predicts Jo Wilfried Tsonga has a 36.2% of chance of winning the match, while Michael Llodra has a 18.33% chance of winning the match. These percentages are lower because the players' rankpoints are significantly lower than those of Nadal's and Djokovic's. 
 
 # Conclusion
 
