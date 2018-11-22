@@ -262,10 +262,6 @@ model.selected.interactions <- step(full_w_interactions,direction="backward")
 # Linear Regression Assumptions
 
 ```{r}
-kable(tidy(model.selected.interactions), format = "markdown", digits = 3)
-```
-
-```{r}
 final.base.model <- model.selected.interactions
 kable(tidy(final.base.model), format = "markdown", digits = 3)
 ```
@@ -314,7 +310,7 @@ table(ten$status, ten$Predicted > threshold)
 ```
 
 ```{r}
-(338 + 13)/(14+13+338+635)
+(326 + 13)/(14+13+326+635)
 ```
 
 
