@@ -245,13 +245,14 @@ kable(tidy(full_model), format="markdown", digits = 3)
 
 ```{r}
 full_w_interactions <- glm(status ~ minutes + ht + age + rank + 
-                rankpoints + ace + df + bpSaved + surface + surface * ace + surface * ht + surface*df, 
+                rankpoints + ace + df + bpSaved + surface + surface * minutes +
+                surface * ht + surface * age + surface * rank + surface * rankpoints + 
+                surface * ace + surface * df + surface * bpSaved,
                 family=binomial,data=ten)
 ```
 
 ```{r}
-AIC(full_model)
-AIC(full_w_interactions)
+tidy(anova(full_model, full_w_interactions, test = "Chisq"))
 ```
 
 
