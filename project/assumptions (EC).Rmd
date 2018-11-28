@@ -1,0 +1,215 @@
+---
+title: "Assumptions"
+author: "Ethan Shen and Steven Herrera"
+date: "11/27/2018"
+output: pdf_document
+---
+
+```{r load-packages, message=FALSE, include=FALSE}
+library(tidyverse)
+library(olsrr)
+library(cowplot)
+library(car)
+library(broom)
+library(knitr)
+library(arm)
+library(tidyr)
+library(pROC)
+library(arm)
+library(rlm)
+```
+
+```{r message=FALSE, include=FALSE}
+atp <- read_csv("files/atp.csv")
+atp2016 <- read_csv("files/atp2016.csv")
+atp2015 <- read_csv("files/atp2015.csv")
+atp2014 <- read_csv("files/atp2014.csv")
+atp2013 <- read_csv("files/atp2013.csv")
+atp2012 <- read_csv("files/atp2012.csv")
+atp2011 <- read_csv("files/atp2011.csv")
+atp2010 <- read_csv("files/atp2010.csv")
+
+atp1 <- atp %>%
+  filter(tourney_date < 20171113)
+
+winners2016 <- atp2016 %>%
+  filter(tourney_date < 20161114)
+
+winners2015 <- atp2015 %>%
+  filter(tourney_date < 20151115) 
+
+winners2014 <- atp2014 %>%
+  filter(tourney_date < 20141109) 
+
+winners2013 <- atp2013 %>%
+  filter(tourney_date < 20131104) 
+
+winners2012 <- atp2012 %>%
+  filter(tourney_date < 20121105) 
+
+winners2011 <- atp2011 %>%
+  filter(tourney_date < 20111114) 
+
+winners2010 <- atp2010 %>%
+  filter(tourney_date < 20101121) 
+
+winners <- rbind(atp1, winners2016, winners2015, winners2014, winners2013, 
+                 winners2012, winners2011, winners2010)
+
+winners_set <- winners %>%
+  filter(best_of == 3,
+         !is.na(w_ace), 
+         !is.na(w_df), 
+         !is.na(w_svpt), 
+         !is.na(w_1stIn), 
+         !is.na(w_1stWon), 
+         !is.na(w_2ndWon),
+         !is.na(w_SvGms), 
+         !is.na(w_bpSaved),
+         !is.na(w_bpFaced),
+         surface!="None")
+
+losers <- winners_set %>%
+  mutate(seed = loser_seed,
+         name = loser_name,
+         hand = loser_hand,
+         ht = loser_ht,
+         age = loser_age,
+         rank = loser_rank,
+         rankpoints = loser_rank_points,
+         ace = l_ace,
+         df = l_df,
+         svpt = l_svpt,
+         firsstIn = l_1stIn,
+         firsttWon = l_1stWon,
+         secondndWon = l_2ndWon,
+         SvGms = l_SvGms,
+         bpSaved = l_bpSaved,
+         bpFaced = l_bpFaced,
+         minutes = minutes,
+         status = 0
+         )  
+  
+
+winners <- winners_set %>%
+  mutate(seed = winner_seed,
+         name = winner_name,
+         hand = winner_hand,
+         ht = winner_ht,
+         age = winner_age,
+         rank = winner_rank,
+         rankpoints = winner_rank_points,
+         ace = w_ace,
+         df = w_df,
+         svpt = w_svpt,
+         firsstIn = w_1stIn,
+         firsttWon = w_1stWon,
+         secondndWon = w_2ndWon,
+         SvGms = w_SvGms,
+         bpSaved = w_bpSaved,
+         bpFaced = w_bpFaced,
+         minutes = minutes,
+         status = 1
+         ) 
+tennis <- rbind(winners,losers)
+
+tennis <- tennis %>%
+  filter(!is.na(seed),
+         !is.na(name),
+         !is.na(hand),
+         !is.na(ht),
+         !is.na(age),
+         !is.na(rank),
+         !is.na(rankpoints),
+         !is.na(ace),
+         !is.na(df),
+         !is.na(svpt),
+         !is.na(firsstIn),
+         !is.na(firsttWon),
+         !is.na(secondndWon),
+         !is.na(SvGms),
+         !is.na(bpSaved),
+         !is.na(bpFaced),
+         !is.na(minutes),
+         !is.na(status))
+```
+
+```{r  message=FALSE, include=FALSE}
+glimpse(tennis)
+```
+
+```{r  message=FALSE, include=FALSE}
+set.seed(1234)
+ten <- tennis %>% sample_n(1000)
+```
+
+```{r  message=FALSE, include=FALSE}
+glimpse(ten)
+```
+
+```{r  message=FALSE, include=FALSE}
+full_w_interactions <- glm(status ~ minutes + ht + age + rank + 
+                rankpoints + ace + df + bpSaved + surface + surface * minutes +
+                surface * ht + surface * age + surface * rank + surface * rankpoints + 
+                surface * ace + surface * df + surface * bpSaved,
+                family=binomial,data=ten)
+```
+
+```{r  message=FALSE, include=FALSE}
+model.selected.interactions <- step(full_w_interactions,direction="backward")
+```
+
+# Linear Regression Assumptions
+
+```{r  message=FALSE, include=FALSE}
+final.base.model <- model.selected.interactions
+kable(tidy(final.base.model), format = "markdown", digits = 3)
+```
+
+# Model Assessment
+
+## Binned Plots with Residuals vs Predicted
+
+```{r}
+ten <- ten %>% mutate(Residuals = residuals.glm(final.base.model,type="response"),
+                          Predicted = predict.glm(final.base.model,type="response"))
+
+binnedplot(ten$Predicted, ten$Residuals,xlab="Predicted Probabilities",
+           ylab="Residuals",main="Binned Residuals vs. Predicted Probabilities")
+```
+
+```{r,fig.height=4,fig.width=4,echo=F}
+binnedplot(ten$minutes, ten$Residuals,xlab="Minutes",
+           ylab="Residuals",main="Binned Residuals vs. Minutes")
+
+binnedplot(ten$ht, ten$Residuals,xlab="Height",
+           ylab="Residuals",main="Binned Residuals vs. Height")
+
+binnedplot(ten$ace, ten$Residuals,xlab="Aces",
+           ylab="Residuals",main="Binned Residuals vs. Aces")
+
+binnedplot(ten$df, ten$Residuals,xlab="Double Faults",
+           ylab="Residuals",main="Binned Residuals vs. Double Faults")
+
+binnedplot(ten$bpSaved, ten$Residuals,xlab="Saved break podints",
+           ylab="Residuals",main="Binned Residuals vs. Saved break points")
+```
+
+Looking at the binned residual plots, we see that all of the plots except for the binned residuals vs. saved break point have random scatter. The binned residuals vs. saved break shows a pattern. This is a violation of the assumptions. 
+
+```{r}
+ROC.ten <- roc(ten$status,ten$Predicted,plot=T)
+```
+
+```{r}
+ROC.ten$auc
+```
+
+```{r}
+threshold = 0.30
+table(ten$status, ten$Predicted > threshold)
+```
+
+```{r}
+(326 + 13)/(14+13+326+635)
+```

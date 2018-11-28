@@ -3,8 +3,8 @@ title: "Project"
 author: "Steven Herrera and Ethan Shen"
 date: "11/09/2018"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r load-packages, message=FALSE}
@@ -140,7 +140,7 @@ tennis <- tennis %>%
 
 Using data manipulation skills in R, we shaped the dataset to show each observation as the outcome of the match for the winner and the loser of each match from 2010-2017. Below, is a glimpse of our dataset.
 
-```{r}
+```{r include=FALSE}
 glimpse(tennis)
 ```
 
@@ -153,7 +153,7 @@ ten <- tennis %>% sample_n(1000)
 
 Here is what our new dataset looks like:
 
-```{r}
+```{r include=FALSE}
 glimpse(ten)
 ```
 
@@ -177,42 +177,42 @@ Looking at the matrix plot, we will already consider removing the following favi
 We will now look at box plots of the numeric variables we will include in our full model:
 
 ```{r fig.height=10, fig.width=8, message=FALSE}
-p1 <- ggplot(data=ten,aes(x=status,y=minutes)) +
+p1 <- ggplot(data=ten,aes(x=status,y=minutes, group=status)) +
   geom_boxplot() + 
   labs(title="Minutes by Status",
        x = "0 if Lost, 1 if Won",
        y = "Minutes")
-p2 <- ggplot(data=ten,aes(x=status,y=ht)) +
+p2 <- ggplot(data=ten,aes(x=status,y=ht, group=status)) +
   geom_boxplot() + 
   labs(title="Height by Status",
        x = "0 if Lost, 1 if Won",
        y = "Height")
-p3 <- ggplot(data=ten,aes(x=status,y=age)) +
+p3 <- ggplot(data=ten,aes(x=status,y=age, group=status)) +
   geom_boxplot() + 
   labs(title="Age by Status",
        x = "0 if Lost, 1 if Won",
        y = "Age (years)")
-p4 <- ggplot(data=ten,aes(x=status,y=rank)) +
+p4 <- ggplot(data=ten,aes(x=status,y=rank, group=status)) +
   geom_boxplot() + 
   labs(title="Ranking by Status",
        x = "0 if Lost, 1 if Won",
        y = "Rank")
-p5 <- ggplot(data=ten,aes(x=status,y=rankpoints)) +
+p5 <- ggplot(data=ten,aes(x=status,y=rankpoints, group=status)) +
   geom_boxplot() + 
   labs(title="Rankpoints by Status",
        x = "0 if Lost, 1 if Won",
        y = "Rankpoints")
-p6 <- ggplot(data=ten,aes(x=status,y=ace)) +
+p6 <- ggplot(data=ten,aes(x=status,y=ace, group=status)) +
   geom_boxplot() + 
   labs(title="Aces by Status",
        x = "0 if Lost, 1 if Won",
        y = "Aces")
-p7 <- ggplot(data=ten,aes(x=status,y=df)) +
+p7 <- ggplot(data=ten,aes(x=status,y=df, group=status)) +
   geom_boxplot() + 
   labs(title="Double Faults by Status",
        x = "0 if Lost, 1 if Won",
        y = "Double Faults")
-p8 <- ggplot(data=ten,aes(x=status,y=bpSaved)) +
+p8 <- ggplot(data=ten,aes(x=status,y=bpSaved, group=status)) +
   geom_boxplot() + 
   labs(title="Saved Breakpoints by Status",
        x = "0 if Lost, 1 if Won",
@@ -293,7 +293,7 @@ binnedplot(ten$ace, ten$Residuals,xlab="Aces",
 binnedplot(ten$df, ten$Residuals,xlab="Double Faults",
            ylab="Residuals",main="Binned Residuals vs. Double Faults")
 
-binnedplot(ten$bpSaved, ten$Residuals,xlab="Saved break points",
+binnedplot(ten$bpSaved, ten$Residuals,xlab="Saved break podints",
            ylab="Residuals",main="Binned Residuals vs. Saved break points")
 ```
 
