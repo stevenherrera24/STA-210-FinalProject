@@ -1,5 +1,5 @@
 ---
-title: "Assumptions"
+title: "-Assumptions-"
 author: "Ethan Shen and Steven Herrera"
 date: "11/27/2018"
 output: pdf_document
@@ -134,20 +134,20 @@ tennis <- tennis %>%
          !is.na(status))
 ```
 
-```{r  message=FALSE, include=FALSE}
+```{r include=FALSE, message=FALSE}
 glimpse(tennis)
 ```
 
-```{r  message=FALSE, include=FALSE}
+```{r include=FALSE, message=FALSE}
 set.seed(1234)
 ten <- tennis %>% sample_n(1000)
 ```
 
-```{r  message=FALSE, include=FALSE}
+```{r include=FALSE, message=FALSE}
 glimpse(ten)
 ```
 
-```{r  message=FALSE, include=FALSE}
+```{r include=FALSE, message=FALSE}
 full_w_interactions <- glm(status ~ minutes + ht + age + rank + 
                 rankpoints + ace + df + bpSaved + surface + surface * minutes +
                 surface * ht + surface * age + surface * rank + surface * rankpoints + 
@@ -155,18 +155,28 @@ full_w_interactions <- glm(status ~ minutes + ht + age + rank +
                 family=binomial,data=ten)
 ```
 
-```{r  message=FALSE, include=FALSE}
+```{r include=FALSE, message=FALSE}
 model.selected.interactions <- step(full_w_interactions,direction="backward")
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+
 # Linear Regression Assumptions
 
-```{r  message=FALSE, include=FALSE}
+```{r}
 final.base.model <- model.selected.interactions
 kable(tidy(final.base.model), format = "markdown", digits = 3)
 ```
-
-# Model Assessment
 
 ## Binned Plots with Residuals vs Predicted
 
