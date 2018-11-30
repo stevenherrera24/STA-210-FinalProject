@@ -379,7 +379,7 @@ table(newten$status, newten$Predicted > threshold)
 ```
 
 ```{r}
-(326 + 13)/(14+13+326+635)
+(342 + 10)/(342 + 10 + 10 + 638)
 ```
 
 
