@@ -12,6 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 options(knitr.kable.NA = '')
 ```
 
+# Loaded Packages
+
 ```{r load-packages, message=FALSE}
 library(tidyverse)
 library(olsrr)
@@ -26,7 +28,9 @@ library(arm)
 library(rlm)
 ```
 
-```{r message=FALSE, include=FALSE}
+# Data Manipulation
+
+```{r message=FALSE}
 atp <- read_csv("files/atp.csv")
 atp2016 <- read_csv("files/atp2016.csv")
 atp2015 <- read_csv("files/atp2015.csv")
@@ -145,7 +149,7 @@ tennis <- tennis %>%
 
 Using data manipulation skills in R, we shaped the dataset to show each observation as the outcome of the match for the winner and the loser of each match from 2010-2017. Below, is a glimpse of our dataset.
 
-```{r include=FALSE}
+```{r}
 glimpse(tennis)
 ```
 
@@ -158,7 +162,7 @@ ten <- tennis %>% sample_n(1000)
 
 Here is what our new dataset looks like:
 
-```{r include=FALSE}
+```{r}
 glimpse(ten)
 ```
 
@@ -383,10 +387,10 @@ table(newten$status, newten$Predicted > threshold)
 
 ## Test cases: 
 
-We will look at a match that was played the Monte Carlo Masters in 2014 between Roger Federer and Novak Djokovic. We want to see the percentage that a player will win the match. 
+We will look at a match that was played the Monte Carlo Masters in 2014 between Roger Federer and Novak Djokovic. We want to see the probability that a player will win the match. 
 
-```{r}
-ten %>%
+```{r message=FALSE}
+tennis %>%
   filter(tourney_name == "Monte Carlo Masters",
          name == "Roger Federer" |  name == "Novak Djokovic",
          tourney_id == "2014-410",
@@ -394,15 +398,15 @@ ten %>%
 ```
 
 ```{r}
-fed <- data.frame(minutes = 75, ht = 185, rankpoints = 5355 , ace = 3 , df = 1, surface = "Hard")
-djo1 <- data.frame(minutes = 75, ht = 188, rankpoints = 11680, ace = 2, df = 0, surface = "Hard")
+fed <- data.frame(minutes = 75, ht = 185, rankpoints = 5355 , ace = 3 , df = 1, surface="Hard")
+djo1 <- data.frame(minutes = 75, ht = 188, rankpoints = 11680, ace = 2, df = 0, surface="Hard")
 predict.glm(final, newdata=fed, type="response")
 predict.glm(final, newdata=djo1, type="response")
 ```
 
-We see that the model predicts Roger Federer has a 77.09% chance of winning the match, while Novak Djokovic has a 92.52% chance of winning the match. This is mainly Djokovic's rank points were almost double that of Federer's. However, Federer won the match. 
+We see that the model predicts Roger Federer has a 77.09% chance of winning the match, while Novak Djokovic has a 92.52% chance of winning the match. This is mainly because Djokovic's rank points were almost double that of Federer's at the time. However, Federer won the match. In this case, we had an anomaly. 
 
-The the next match we will look at was played at the China Open in 2013 and was between Novak Djokovic and Rafael Nadal.
+The next match we will look at was played at the China Open in 2013 and was between Novak Djokovic and Rafael Nadal.
 
 ```{r}
 tennis %>%
@@ -413,8 +417,8 @@ tennis %>%
 
 ```
 ```{r}
-djo2 <- data.frame(minutes = 87, ht = 188, rankpoints = 11120, ace = 5, df = 1, surface = "Hard")
-nadal <- data.frame(minutes = 87, ht = 185, rankpoints = 10860, ace = 2, df = 2, surface = "Hard")
+djo2 <- data.frame(minutes = 87, ht = 188, rankpoints = 11120, ace = 5, df = 1)
+nadal <- data.frame(minutes = 87, ht = 185, rankpoints = 10860, ace = 2, df = 2)
 predict.glm(final, newdata=djo2, type="response")
 predict.glm(final, newdata=nadal, type="response")
 ```
