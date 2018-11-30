@@ -322,17 +322,18 @@ newten <- newten %>%
 ```
 
 ## Leverage and Cook's Distance 
-```{r}
-p1 <- ggplot(data=newten, aes(x=obs.num,y=leverage)) + 
+```{r fig.height=2}
+ggplot(data=newten, aes(x=obs.num,y=leverage)) + 
   geom_point(alpha=0.5) + 
   geom_hline(yintercept=0.1,color="red")+
   labs(x="Observation Number",y="Leverage",title="Leverage")
+```
 
-p2 <- ggplot(data=newten, aes(x=obs.num,y=cooks)) + 
+```{r fig.height=2}
+ggplot(data=newten, aes(x=obs.num,y=cooks)) + 
   geom_point() + 
   geom_hline(yintercept=1,color="red")+
   labs(x="Observation Number",y="Cook's Distance",title="Cook's Distance")
-plot_grid(p1,p2)
 ```
 
 ## VIF
@@ -340,4 +341,16 @@ plot_grid(p1,p2)
 ```{r}
 tidy(vif(final))
 ```
+
+
+# Conclusion
+
+With VIF values less than 10, observations that are under the leverage and Cook's distance line, and binned residual plots that complete the assumptions, we have cleared model assessment and assumptions for the following final model:
+
+```{r}
+kable(tidy(final), format = "markdown", digits = 6)
+```
+
+
+
 
