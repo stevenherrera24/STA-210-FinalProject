@@ -1,11 +1,16 @@
 ---
-title: "Project"
+title: "What Makes the Best Tennis Player?"
 author: "Steven Herrera and Ethan Shen"
 date: "11/09/2018"
 output:
   pdf_document: default
   html_document: default
 ---
+
+```{r setup, message=F,include=F}
+knitr::opts_chunk$set(echo = TRUE)
+options(knitr.kable.NA = '')
+```
 
 ```{r load-packages, message=FALSE}
 library(tidyverse)
