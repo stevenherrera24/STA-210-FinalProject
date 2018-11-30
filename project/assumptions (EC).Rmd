@@ -223,3 +223,27 @@ table(ten$status, ten$Predicted > threshold)
 ```{r}
 (326 + 13)/(14+13+326+635)
 ```
+
+
+
+```{r}
+ten <- ten %>%
+  mutate(leverage = hatvalues(final.base.model), 
+         cooks = cooks.distance(final.base.model),
+         stand.resid = rstandard(final.base.model), 
+         obs.num = row_number())
+```
+
+```{r}
+p1 <- ggplot(data=ten, aes(x=obs.num,y=leverage)) + 
+  geom_point(alpha=0.5) + 
+  geom_hline(yintercept=0.1,color="red")+
+  labs(x="Observation Number",y="Leverage",title="Leverage")
+
+p2 <- ggplot(data=ten, aes(x=obs.num,y=cooks)) + 
+  geom_point() + 
+  geom_hline(yintercept=1,color="red")+
+  labs(x="Observation Number",y="Cook's Distance",title="Cook's Distance")
+plot_grid(p1,p2)
+```
+

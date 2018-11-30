@@ -272,7 +272,6 @@ final.base.model <- model.selected.interactions
 kable(tidy(final.base.model), format = "markdown", digits = 3)
 ```
 
-
 # Model Assessment
 
 ## Binned Plots with Residuals vs Predicted
@@ -291,6 +290,9 @@ binnedplot(ten$minutes, ten$Residuals,xlab="Minutes",
 
 binnedplot(ten$ht, ten$Residuals,xlab="Height",
            ylab="Residuals",main="Binned Residuals vs. Height")
+
+binnedplot(ten$rankpoints, ten$Residuals,xlab="Rankpoints",
+           ylab="Residuals",main="Binned Residuals vs. Rankpoints")
 
 binnedplot(ten$ace, ten$Residuals,xlab="Aces",
            ylab="Residuals",main="Binned Residuals vs. Aces")
@@ -313,6 +315,64 @@ ROC.ten$auc
 ```{r}
 threshold = 0.30
 table(ten$status, ten$Predicted > threshold)
+```
+
+```{r}
+(326 + 13)/(14+13+326+635)
+```
+
+
+# Linear Regression Assumptions
+
+Unfortunately, one of our residuals plots has a non-linear relationship. Thus, we will remove `bpSaved` from the model. 
+
+```{r}
+newten <- ten
+final <- glm(status ~ minutes + ht + rankpoints + ace + df + surface + surface * ht + surface * ace + surface * df, family = binomial, data = newten)
+kable(tidy(final), format = "markdown", digits = 3)
+```
+
+
+# Model Assessment
+
+## Binned Plots with Residuals vs Predicted
+
+```{r}
+newten <- newten %>% mutate(Residuals = residuals.glm(final,type="response"),
+                          Predicted = predict.glm(final,type="response"))
+
+binnedplot(newten$Predicted, newten$Residuals,xlab="Predicted Probabilities",
+           ylab="Residuals",main="Binned Residuals vs. Predicted Probabilities")
+```
+
+```{r,fig.height=4,fig.width=4,echo=F}
+binnedplot(newten$minutes, newten$Residuals,xlab="Minutes",
+           ylab="Residuals",main="Binned Residuals vs. Minutes")
+
+binnedplot(newten$ht, newten$Residuals,xlab="Height",
+           ylab="Residuals",main="Binned Residuals vs. Height")
+
+binnedplot(newten$ace, newten$Residuals,xlab="Aces",
+           ylab="Residuals",main="Binned Residuals vs. Aces")
+
+binnedplot(newten$df, newten$Residuals,xlab="Double Faults",
+           ylab="Residuals",main="Binned Residuals vs. Double Faults")
+
+binnedplot(newten$rankpoints, newten$Residuals,xlab="Rankpoints",
+           ylab="Residuals",main="Binned Residuals vs. Rankpoints")
+```
+
+```{r}
+ROC.newten <- roc(newten$status,newten$Predicted,plot=T)
+```
+
+```{r}
+ROC.newten$auc
+```
+
+```{r}
+threshold = 0.30
+table(newten$status, newten$Predicted > threshold)
 ```
 
 ```{r}
