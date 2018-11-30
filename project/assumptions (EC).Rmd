@@ -244,60 +244,100 @@ binnedplot(ten$bpSaved, ten$Residuals,xlab="Saved Break Points",
 Looking at the binned residual plots, we see that all of the plots except for the binned residuals vs. saved break point have random scatter. The binned residuals vs. saved break shows a pattern. This is a violation of the assumptions. 
 
 
+# Influential Points 
 
+## VIF
 
+```{r}
+tidy(vif(final.base.model))
+```
 
+After looking at the VIF values, we see that the VIF for `surface` is greater than 10, so we will also remove it from the model. This means we will also have to remove the interaction variables as well. 
 
+# Linear Regression Assumptions: Revised
 
+Because one of our residuals plots has a non-linear relationship, we will remove `bpSaved` from the model and redo the assumptions. We will also remove `surface` and its corresponding interactions effects. 
 
-
-
-
-
-
-
-
-
+```{r}
+newten <- ten
+final <- glm(status ~ minutes + ht + rankpoints + ace + df, family = binomial, 
+             data = newten)
+kable(tidy(final), format = "markdown", digits = 6)
+```
 
 # Model Assessment
 
+## Binned Plots with Residuals vs Predicted
+
 ```{r}
-ROC.ten <- roc(ten$status,ten$Predicted,plot=T)
+newten <- newten %>% mutate(Residuals = residuals.glm(final,type="response"),
+                          Predicted = predict.glm(final,type="response"))
+
+binnedplot(newten$Predicted, newten$Residuals,xlab="Predicted Probabilities",
+           ylab="Residuals",main="Binned Residuals vs. Predicted Probabilities")
+```
+
+```{r,fig.height=4,fig.width=4,echo=F}
+binnedplot(newten$minutes, newten$Residuals,xlab="Minutes",
+           ylab="Residuals",main="Binned Residuals vs. Minutes")
+
+binnedplot(newten$ht, newten$Residuals,xlab="Height",
+           ylab="Residuals",main="Binned Residuals vs. Height")
+
+binnedplot(newten$ace, newten$Residuals,xlab="Aces",
+           ylab="Residuals",main="Binned Residuals vs. Aces")
+
+binnedplot(newten$df, newten$Residuals,xlab="Double Faults",
+           ylab="Residuals",main="Binned Residuals vs. Double Faults")
+
+binnedplot(newten$rankpoints, newten$Residuals,xlab="Rankpoints",
+           ylab="Residuals",main="Binned Residuals vs. Rankpoints")
 ```
 
 ```{r}
-ROC.ten$auc
+ROC.newten <- roc(newten$status,newten$Predicted,plot=T)
+```
+
+```{r}
+ROC.newten$auc
 ```
 
 ```{r}
 threshold = 0.30
-table(ten$status, ten$Predicted > threshold)
+table(newten$status, newten$Predicted > threshold)
 ```
 
 ```{r}
-(326 + 13)/(14+13+326+635)
+(342 + 10)/(342 + 10 + 10 + 638)
 ```
 
-
+# Influential Points 
 
 ```{r}
-ten <- ten %>%
-  mutate(leverage = hatvalues(final.base.model), 
-         cooks = cooks.distance(final.base.model),
-         stand.resid = rstandard(final.base.model), 
+newten <- newten %>%
+  mutate(leverage = hatvalues(final), 
+         cooks = cooks.distance(final),
+         stand.resid = rstandard(final), 
          obs.num = row_number())
 ```
 
+## Leverage and Cook's Distance 
 ```{r}
-p1 <- ggplot(data=ten, aes(x=obs.num,y=leverage)) + 
+p1 <- ggplot(data=newten, aes(x=obs.num,y=leverage)) + 
   geom_point(alpha=0.5) + 
   geom_hline(yintercept=0.1,color="red")+
   labs(x="Observation Number",y="Leverage",title="Leverage")
 
-p2 <- ggplot(data=ten, aes(x=obs.num,y=cooks)) + 
+p2 <- ggplot(data=newten, aes(x=obs.num,y=cooks)) + 
   geom_point() + 
   geom_hline(yintercept=1,color="red")+
   labs(x="Observation Number",y="Cook's Distance",title="Cook's Distance")
 plot_grid(p1,p2)
+```
+
+## VIF
+
+```{r}
+tidy(vif(final))
 ```
 
