@@ -322,7 +322,7 @@ table(ten$status, ten$Predicted > threshold)
 ```
 
 
-# Linear Regression Assumptions
+# Linear Regression Assumptions: Revised
 
 Unfortunately, one of our residuals plots has a non-linear relationship. Thus, we will remove `bpSaved` from the model. 
 
@@ -331,7 +331,6 @@ newten <- ten
 final <- glm(status ~ minutes + ht + rankpoints + ace + df + surface + surface * ht + surface * ace + surface * df, family = binomial, data = newten)
 kable(tidy(final), format = "markdown", digits = 3)
 ```
-
 
 # Model Assessment
 
