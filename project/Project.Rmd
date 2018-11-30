@@ -395,13 +395,13 @@ ten %>%
 ```
 
 ```{r}
-fed <- data.frame(minutes = 75, ht = 185, rankpoints = 5355 , ace = 3 , df = 1, bpSaved = 2, surface = "Hard")
-djo1 <- data.frame(minutes = 75, ht = 188, rankpoints = 11680, ace = 2, df = 0, bpSaved = 2, surface = "Hard")
-predict.glm(final.base.model, newdata=fed, type="response")
-predict.glm(final.base.model, newdata=djo1, type="response")
+fed <- data.frame(minutes = 75, ht = 185, rankpoints = 5355 , ace = 3 , df = 1, surface = "Hard")
+djo1 <- data.frame(minutes = 75, ht = 188, rankpoints = 11680, ace = 2, df = 0, surface = "Hard")
+predict.glm(final, newdata=fed, type="response")
+predict.glm(final, newdata=djo1, type="response")
 ```
 
-We see that the model predicts Roger Federer has a 77.54% chance of winning the match, while Novak Djokovic has a 92.43% chance of winning the match. This is mainly Djokovic's rank points were almost double that of Federer's. However, Federer won the match. 
+We see that the model predicts Roger Federer has a 77.09% chance of winning the match, while Novak Djokovic has a 92.52% chance of winning the match. This is mainly Djokovic's rank points were almost double that of Federer's. However, Federer won the match. 
 
 The the next match we will look at was played at the China Open in 2013 and was between Novak Djokovic and Rafael Nadal.
 
@@ -414,12 +414,12 @@ tennis %>%
 
 ```
 ```{r}
-djo2 <- data.frame(minutes = 87, ht = 188, rankpoints = 11120, ace = 5, df = 1, bpSaved = 0, surface = "Hard")
-nadal <- data.frame(minutes = 87, ht = 185, rankpoints = 10860, ace = 2, df = 2, bpSaved = 2, surface = "Hard")
-predict.glm(final.base.model, newdata=djo2, type="response")
-predict.glm(final.base.model, newdata=nadal, type="response")
+djo2 <- data.frame(minutes = 87, ht = 188, rankpoints = 11120, ace = 5, df = 1, surface = "Hard")
+nadal <- data.frame(minutes = 87, ht = 185, rankpoints = 10860, ace = 2, df = 2, surface = "Hard")
+predict.glm(final, newdata=djo2, type="response")
+predict.glm(final, newdata=nadal, type="response")
 ```
-We see that the model predicts Novak Djokovic has a 92.95% chance of winning the match, while Rafael Nadal has a 88.09% chance of winning the match. Djokovic won the match. 
+We see that the model predicts Novak Djokovic has a 91.7% chance of winning the match, while Rafael Nadal has a 87.51% chance of winning the match. Djokovic won the match. 
 
 ### Test Case with Similar Rank Points 
 
@@ -435,13 +435,13 @@ ten %>%
 ```
 
 ```{r}
-jo <- data.frame(minutes = 23, ht = 188, rankpoints = 1480, ace = 2, df = 1, bpSaved = 0, surface = "Grass")
-llodra <- data.frame(minutes = 23, ht = 190, rankpoints = 1400, ace = 0, df = 0, bpSaved = 0, surface = "Grass")
-predict.glm(final.base.model, newdata=jo, type="response")
-predict.glm(final.base.model, newdata=llodra, type="response")
+jo <- data.frame(minutes = 23, ht = 188, rankpoints = 1480, ace = 2, df = 1, surface = "Grass")
+llodra <- data.frame(minutes = 23, ht = 190, rankpoints = 1400, ace = 0, df = 0, surface = "Grass")
+predict.glm(final, newdata=jo, type="response")
+predict.glm(final, newdata=llodra, type="response")
 ```
 
-We see that the model predicts Jo Wilfried Tsonga has a 36.2% of chance of winning the match, while Michael Llodra has a 18.33% chance of winning the match. These percentages are lower because the players' rankpoints are significantly lower than those of Nadal's and Djokovic's. 
+We see that the model predicts Jo Wilfried Tsonga has a 36.46% of chance of winning the match, while Michael Llodra has a 18.91% chance of winning the match. These percentages are lower because the players' rankpoints are significantly lower than those of Nadal's and Djokovic's. 
 
 # Conclusion
 
