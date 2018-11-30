@@ -1,7 +1,7 @@
 ---
-title: "-Assumptions-"
+title: "- Assumptions -"
 author: "Ethan Shen and Steven Herrera"
-date: "11/27/2018"
+date: "Due: December 2, 2018"
 output: pdf_document
 ---
 
@@ -169,14 +169,32 @@ model.selected.interactions <- step(full_w_interactions,direction="backward")
 
 
 
+Given our model, below are the assumptions and model assessment features that we will cover. 
 
+Assumptions:
 
-# Linear Regression Assumptions
+1) Plot of binned residuals vs. predicted values
+
+2) Plot of binned residuals vs. numeric explanatory variables
+
+3) Influential points and multicollinearity
+
+Model Fit:
+
+1) Examine confusion matrix
+
+2) Examine ROC curve
+
+# Final Model
+
+Below, is our final model with interaction effects.
 
 ```{r}
 final.base.model <- model.selected.interactions
 kable(tidy(final.base.model), format = "markdown", digits = 3)
 ```
+
+# Assumptions
 
 ## Binned Plots with Residuals vs Predicted
 
@@ -188,24 +206,60 @@ binnedplot(ten$Predicted, ten$Residuals,xlab="Predicted Probabilities",
            ylab="Residuals",main="Binned Residuals vs. Predicted Probabilities")
 ```
 
-```{r,fig.height=4,fig.width=4,echo=F}
+Looking at this plot, we do not see any violations of the assumptions. We see a plot that does not have a distinct pattern.
+
+## Binned Residuals vs Numeric Explanatory Variables
+
+```{r}
 binnedplot(ten$minutes, ten$Residuals,xlab="Minutes",
            ylab="Residuals",main="Binned Residuals vs. Minutes")
+```
 
+```{r}
 binnedplot(ten$ht, ten$Residuals,xlab="Height",
            ylab="Residuals",main="Binned Residuals vs. Height")
+```
 
+```{r}
 binnedplot(ten$ace, ten$Residuals,xlab="Aces",
            ylab="Residuals",main="Binned Residuals vs. Aces")
+```
 
+```{r}
+binnedplot(ten$rankpoints, ten$Residuals,xlab="Rank Points",
+           ylab="Residuals",main="Binned Residuals vs. Rank Points")
+```
+
+```{r}
 binnedplot(ten$df, ten$Residuals,xlab="Double Faults",
            ylab="Residuals",main="Binned Residuals vs. Double Faults")
+```
 
-binnedplot(ten$bpSaved, ten$Residuals,xlab="Saved break podints",
-           ylab="Residuals",main="Binned Residuals vs. Saved break points")
+```{r}
+
+binnedplot(ten$bpSaved, ten$Residuals,xlab="Saved Break Points",
+           ylab="Residuals",main="Binned Residuals vs. Saved Break Points")
 ```
 
 Looking at the binned residual plots, we see that all of the plots except for the binned residuals vs. saved break point have random scatter. The binned residuals vs. saved break shows a pattern. This is a violation of the assumptions. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Model Assessment
 
 ```{r}
 ROC.ten <- roc(ten$status,ten$Predicted,plot=T)
