@@ -269,7 +269,7 @@ tidy(anova(full_model, full_w_interactions, test = "Chisq"))
 model.selected.interactions <- step(full_w_interactions,direction="backward")
 ```
 
-# Linear Regression Assumptions
+# Model
 
 ```{r}
 final.base.model <- model.selected.interactions
