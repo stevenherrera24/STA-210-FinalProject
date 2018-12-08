@@ -3,8 +3,8 @@ title: "What Makes the Best Tennis Player?"
 author: "Steven Herrera and Ethan Shen"
 date: "11/09/2018"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, message=F,include=F}
@@ -181,7 +181,7 @@ pairs(status ~ minutes + ht + age + rank + rankpoints + ace +
       main = "Matrix of scatterplots for Tournament Wins and Variables")
 ```
 
-Looking at the matrix plot, we will already consider removing the following favirables because of multicollinearity: `svpt`, `firsstIn`, `firsttWon`, `secondndWon`, `SvGms`, and `bpFaced`.
+Looking at the matrix plot, we will consider removing the following favirables because of multicollinearity: `svpt`, `firsstIn`, `firsttWon`, `secondndWon`, `SvGms`, and `bpFaced`.
 
 We will now look at box plots of the numeric variables we will include in our full model:
 
@@ -240,7 +240,7 @@ ggplot(data=ten,aes(x=surface, fill = status)) + geom_bar(position = "fill") +
 
 In looking at all of these observations, it seems like the medians of the numeric distributions do not seem to differ that much by status of winning or losing. The same can be said about the proportions of winning and losing matches against all three surfaces. In creating our model, it could be difficult to see which variables could be helpful in differentiating between whether a player will win a match or not. But, we hope to see that a combination of these variables will be helpful in determining a model that best predicts the percentage of winning a match.
 
-# Logistic Regression Model
+# Logistic Regression Model: Version 1
 
 To begin our regression models, we will use all of the variables we deemed important from our exploratory data analysis.
 
@@ -261,11 +261,6 @@ full_w_interactions <- glm(status ~ minutes + ht + age + rank +
 ```
 
 ```{r}
-tidy(anova(full_model, full_w_interactions, test = "Chisq"))
-```
-
-
-```{r}
 model.selected.interactions <- step(full_w_interactions,direction="backward")
 ```
 
@@ -278,7 +273,7 @@ kable(tidy(final.base.model), format = "markdown", digits = 3)
 
 # Model Assessment
 
-## Binned Plots with Residuals vs Predicted
+## Binned Residual Plots 
 
 ```{r}
 ten <- ten %>% mutate(Residuals = residuals.glm(final.base.model,type="response"),
@@ -305,7 +300,7 @@ binnedplot(ten$df, ten$Residuals,xlab="Double Faults",
            ylab="Residuals",main="Binned Residuals vs. Double Faults")
 
 binnedplot(ten$bpSaved, ten$Residuals,xlab="Saved break podints",
-           ylab="Residuals",main="Binned Residuals vs. Saved break points")
+           ylab="Residuals",main="Binned Residuals vs. Saved Break Points")
 ```
 
 ```{r}
@@ -322,13 +317,21 @@ table(ten$status, ten$Predicted > threshold)
 ```
 
 ```{r}
-(326 + 13)/(14+13+326+635)
+(326 + 13)/(26+13+326+635)
+```
+# Influential Points 
+
+## VIF
+
+```{r}
+tidy(vif(final.base.model))
 ```
 
+After looking at the VIF values, we see that the VIF for `surface` is greater than 10, so we will also remove it from the model. This means we will also have to remove the interaction variables as well. Since there are issues with this model, we will not continue checking the other assumptions. 
 
-# Linear Regression Assumptions: Revised
+# Linear Regression Assumptions: Version 2 
 
-Unfortunately, one of our residuals plots has a non-linear relationship. Thus, we will remove `bpSaved` from the model. 
+Because one of our residuals plots has a non-linear relationship, we will remove `bpSaved` from the model and redo the assumptions. We will also remove `surface` and its corresponding interactions effects because `surface` has a high VIF value. 
 
 ```{r}
 newten <- ten
@@ -336,9 +339,15 @@ final <- glm(status ~ minutes + ht + rankpoints + ace + df, family = binomial, d
 kable(tidy(final), format = "markdown", digits = 3)
 ```
 
-# Model Assessment
+```{r}
+pairs(status ~ minutes + ht + rankpoints + ace + df, data = newten)
+```
 
-## Binned Plots with Residuals vs Predicted
+The scatterplot matrix does not show obvious signs of multicollinearity. 
+
+## Model Assessment
+
+### Binned Plots with Residuals vs Predicted
 
 ```{r}
 newten <- newten %>% mutate(Residuals = residuals.glm(final,type="response"),
@@ -365,6 +374,8 @@ binnedplot(newten$rankpoints, newten$Residuals,xlab="Rankpoints",
            ylab="Residuals",main="Binned Residuals vs. Rankpoints")
 ```
 
+### ROC curve and Confusion Matrix 
+
 ```{r}
 ROC.newten <- roc(newten$status,newten$Predicted,plot=T)
 ```
@@ -382,6 +393,39 @@ table(newten$status, newten$Predicted > threshold)
 (342 + 10)/(342 + 10 + 10 + 638)
 ```
 
+## Influential Points 
+
+```{r}
+newten <- newten %>%
+  mutate(leverage = hatvalues(final), 
+         cooks = cooks.distance(final),
+         stand.resid = rstandard(final), 
+         obs.num = row_number())
+```
+
+### Leverage and Cook's Distance 
+
+```{r}
+p1 <- ggplot(data=newten, aes(x=obs.num,y=leverage)) + 
+  geom_point(alpha=0.5) + 
+  geom_hline(yintercept=0.1,color="red")+
+  labs(x="Observation Number",y="Leverage",title="Leverage")
+
+p2 <- ggplot(data=newten, aes(x=obs.num,y=cooks)) + 
+  geom_point() + 
+  geom_hline(yintercept=1,color="red")+
+  labs(x="Observation Number",y="Cook's Distance",title="Cook's Distance")
+
+plot_grid(p1,p2)
+```
+
+## VIF 
+
+```{r}
+tidy(vif(final))
+```
+
+There are no observations with large leverage or a Cook's Distance that is above the threshold. We also see that the VIF values of our variables are all less than 10. 
 
 # Prediction
 
@@ -400,8 +444,24 @@ tennis %>%
 ```{r}
 fed <- data.frame(minutes = 75, ht = 185, rankpoints = 5355 , ace = 3 , df = 1)
 djo1 <- data.frame(minutes = 75, ht = 188, rankpoints = 11680, ace = 2, df = 0)
-predict.glm(final, newdata=fed, type="response")
-predict.glm(final, newdata=djo1, type="response")
+predict(final, newdata=fed, type="response")
+predict(final, newdata=djo1, type="response")
+```
+
+```{r}
+predsdjo1 <- predict(final, djo1, type="response", se.fit=TRUE)
+predsfed <- predict(final, fed, type="response", se.fit=TRUE)
+
+predfdjo1 <- predsdjo1$fit # predicted
+lowerdjo1 <- predsdjo1$fit - (1.96*predsdjo1$se.fit) # lower bounds
+upperdjo1 <- predsdjo1$fit + (1.96*predsdjo1$se.fit) # upper bounds
+
+predffed <- predsfed$fit # predicted
+lowerfed <- predsfed$fit - (1.96*predsfed$se.fit) # lower bounds
+upperfed <- predsfed$fit + (1.96*predsfed$se.fit) # lower bounds
+
+c(predfdjo1, lowerdjo1, upperdjo1)
+c(predffed, lowerfed, upperfed)
 ```
 
 We see that the model predicts Roger Federer has a 79.37% chance of winning the match, while Novak Djokovic has a 92.52% chance of winning the match. This is mainly because Djokovic's rank points were almost double that of Federer's at the time. However, Federer won the match. In this case, we had an anomaly. 
@@ -420,9 +480,10 @@ tennis %>%
 ```{r}
 djo2 <- data.frame(minutes = 87, ht = 188, rankpoints = 11120, ace = 5, df = 1)
 nadal <- data.frame(minutes = 87, ht = 185, rankpoints = 10860, ace = 2, df = 2)
-predict.glm(final, newdata=djo2, type="response")
-predict.glm(final, newdata=nadal, type="response")
+predict(final, newdata=djo2, type="response")
+predict(final, newdata=nadal, type="response")
 ```
+
 We see that the model predicts Novak Djokovic has a 91.82% chance of winning the match, while Rafael Nadal has a 87.96% chance of winning the match. Djokovic won the match. 
 
 ### Test Case with Similar Rank Points 
@@ -441,9 +502,26 @@ ten %>%
 ```{r}
 jo <- data.frame(minutes = 23, ht = 188, rankpoints = 1480, ace = 2, df = 1)
 llodra <- data.frame(minutes = 23, ht = 190, rankpoints = 1400, ace = 0, df = 0)
-predict.glm(final, newdata=jo, type="response")
-predict.glm(final, newdata=llodra, type="response")
+predict(final, newdata=jo, type="response")
+predict(final, newdata=llodra, type="response")
 ```
+
+```{r}
+predsjo <- predict(final, jo, type="response", se.fit=TRUE)
+predsllodra <- predict(final, llodra, type="response", se.fit=TRUE)
+
+predfjo <- predsjo$fit # predicted
+lowerjo <- predsjo$fit - (1.96*predsjo$se.fit) # lower bounds
+upperjo <- predsjo$fit + (1.96*predsjo$se.fit) # upper bounds
+
+predfllodra <- predsllodra$fit # predicted
+lowerllodra <- predsllodra$fit - (1.96*predsllodra$se.fit) # lower bounds
+upperllodra <- predsllodra$fit + (1.96*predsllodra$se.fit) # lower bounds
+
+c(predfjo, lowerjo, upperjo)
+c(predfllodra, lowerllodra, upperllodra)
+```
+
 
 We see that the model predicts Jo Wilfried Tsonga has a 71.81% of chance of winning the match, while Michael Llodra has a 70.16% chance of winning the match. These percentages are lower because the players' rankpoints are significantly lower than those of Nadal's and Djokovic's. 
 
