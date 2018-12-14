@@ -321,7 +321,7 @@ ROC.ten <- roc(ten$status,ten$Predicted,plot=T)
 ROC.ten$auc
 ```
 
-Because our binned residual vs. `bpSaved` plot looks rough, we will decide to remove the variable.
+Because our binned residual vs. `bpSaved` plot has a non-linear relationship, we decided to remove the variable.
 
 # Influential Points 
 
@@ -341,6 +341,10 @@ This is our revised final model, after removing `surface` and `bpSaved`. We will
 newten <- ten
 final <- glm(status ~ minutes + ht + rankpoints + ace + df, family = binomial, data = newten)
 kable(tidy(final), format = "markdown", digits = 6)
+```
+
+```{r}
+pairs(status ~ minutes + ht + rankpoints + ace + df, data = newten)
 ```
 
 # Prediction
