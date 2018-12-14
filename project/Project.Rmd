@@ -343,10 +343,6 @@ final <- glm(status ~ minutes + ht + rankpoints + ace + df, family = binomial, d
 kable(tidy(final), format = "markdown", digits = 6)
 ```
 
-```{r}
-pairs(status ~ minutes + ht + rankpoints + ace + df, data = newten)
-```
-
 # Prediction
 
 ## Test cases: 

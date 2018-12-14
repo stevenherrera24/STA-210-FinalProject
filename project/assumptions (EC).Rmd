@@ -230,16 +230,19 @@ ggplot(data=newten, aes(x=obs.num,y=cooks)) +
   labs(x="Observation Number",y="Cook's Distance",title="Cook's Distance")
 ```
 
-## VIF
+## VIF and Multicollinearity 
 
 ```{r}
 tidy(vif(final))
 ```
 
+```{r}
+pairs(status ~ minutes + ht + rankpoints + ace + df, data = newten)
+```
 
 # Conclusion
 
-With VIF values less than 10, observations that are under the leverage and Cook's distance line, and binned residual plots that complete the assumptions, we have cleared model assessment and assumptions for the following final model:
+With VIF values less than 10 and a scatterplot matrix that does not show obvious linear relationships between the explanatory variables, observations that are under the leverage and Cook's distance threshold, and binned residual plots that satisfy the assumptions, we have cleared model assessment and assumptions for the following final model:
 
 ```{r}
 kable(tidy(final), format = "markdown", digits = 6)
