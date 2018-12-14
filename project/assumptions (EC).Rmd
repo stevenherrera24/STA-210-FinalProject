@@ -1,8 +1,10 @@
 ---
-title: "- Assumptions -"
-author: "Ethan Shen and Steven Herrera"
-date: "Due: December 2, 2018"
-output: pdf_document
+title: "Assumptions"
+author: "Steven Herrera and Ethan Shen"
+date: "11/09/2018"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r load-packages, message=FALSE, include=FALSE}
@@ -147,106 +149,9 @@ ten <- tennis %>% sample_n(1000)
 glimpse(ten)
 ```
 
-```{r include=FALSE, message=FALSE}
-full_w_interactions <- glm(status ~ minutes + ht + age + rank + 
-                rankpoints + ace + df + bpSaved + surface + surface * minutes +
-                surface * ht + surface * age + surface * rank + surface * rankpoints + 
-                surface * ace + surface * df + surface * bpSaved,
-                family=binomial,data=ten)
-```
+# Logistic Regression Assumptions
 
-```{r include=FALSE, message=FALSE}
-model.selected.interactions <- step(full_w_interactions,direction="backward")
-```
-
-Given our model, below are the assumptions and model assessment features that we will cover. 
-
-Assumptions:
-
-1) Plot of binned residuals vs. predicted values
-
-2) Plot of binned residuals vs. numeric explanatory variables
-
-3) Influential points and multicollinearity
-
-Model Fit:
-
-1) Examine confusion matrix
-
-2) Examine ROC curve
-
-# Final Model
-
-Below, is our final model with interaction effects, after removing the obvious cases of multicollinearity. 
-
-```{r}
-final.base.model <- model.selected.interactions
-kable(tidy(final.base.model), format = "markdown", digits = 3)
-```
-
-# Assumptions
-
-## Binned Plots with Residuals vs Predicted
-
-```{r}
-ten <- ten %>% mutate(Residuals = residuals.glm(final.base.model,type="response"),
-                          Predicted = predict.glm(final.base.model,type="response"))
-
-binnedplot(ten$Predicted, ten$Residuals,xlab="Predicted Probabilities",
-           ylab="Residuals",main="Binned Residuals vs. Predicted Probabilities")
-```
-
-Looking at this plot, we do not see any violations of the assumptions. We see a plot that does not have a distinct pattern.
-
-## Binned Residuals vs Numeric Explanatory Variables
-
-```{r}
-binnedplot(ten$minutes, ten$Residuals,xlab="Minutes",
-           ylab="Residuals",main="Binned Residuals vs. Minutes")
-```
-
-```{r}
-binnedplot(ten$ht, ten$Residuals,xlab="Height",
-           ylab="Residuals",main="Binned Residuals vs. Height")
-```
-
-```{r}
-binnedplot(ten$ace, ten$Residuals,xlab="Aces",
-           ylab="Residuals",main="Binned Residuals vs. Aces")
-```
-
-```{r}
-binnedplot(ten$rankpoints, ten$Residuals,xlab="Rank Points",
-           ylab="Residuals",main="Binned Residuals vs. Rank Points")
-```
-
-```{r}
-binnedplot(ten$df, ten$Residuals,xlab="Double Faults",
-           ylab="Residuals",main="Binned Residuals vs. Double Faults")
-```
-
-```{r}
-
-binnedplot(ten$bpSaved, ten$Residuals,xlab="Saved Break Points",
-           ylab="Residuals",main="Binned Residuals vs. Saved Break Points")
-```
-
-Looking at the binned residual plots, we see that all of the plots except for the binned residuals vs. saved break point have random scatter. The binned residuals vs. saved break shows a pattern. This is a violation of the assumptions. 
-
-
-# Influential Points 
-
-## VIF
-
-```{r}
-tidy(vif(final.base.model))
-```
-
-After looking at the VIF values, we see that the VIF for `surface` is greater than 10, so we will also remove it from the model. This means we will also have to remove the interaction variables as well. 
-
-# Logistic Regression Assumptions: Revised
-
-Because one of our residuals plots has a non-linear relationship, we will remove `bpSaved` from the model and redo the assumptions. We will also remove `surface` and its corresponding interactions effects. 
+After looking at exploratory data analysis, found on our Project RMD file, we have concluded with the following model that we will use as our final model:
 
 ```{r}
 newten <- ten
@@ -258,6 +163,14 @@ kable(tidy(final), format = "markdown", digits = 6)
 # Model Assessment
 
 ## Binned Plots with Residuals vs Predicted
+
+We will further our investigation of whether our new model follows the key model assessment characteristics:
+
+- Good binned residual vs. predicted plot
+
+- Good binned residual vs. numerical explanatory plots
+
+- Large area under the ROC curve
 
 ```{r}
 newten <- newten %>% mutate(Residuals = residuals.glm(final,type="response"),
@@ -290,15 +203,6 @@ ROC.newten <- roc(newten$status,newten$Predicted,plot=T)
 
 ```{r}
 ROC.newten$auc
-```
-
-```{r}
-threshold = 0.30
-table(newten$status, newten$Predicted > threshold)
-```
-
-```{r}
-(342 + 10)/(342 + 10 + 10 + 638)
 ```
 
 # Influential Points 
