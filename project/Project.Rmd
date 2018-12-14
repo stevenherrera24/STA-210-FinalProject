@@ -3,8 +3,8 @@ title: "What Makes the Best Tennis Player?"
 author: "Steven Herrera and Ethan Shen"
 date: "11/09/2018"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, message=F,include=F}
@@ -181,9 +181,9 @@ pairs(status ~ minutes + ht + age + rank + rankpoints + ace +
       main = "Matrix of scatterplots for Tournament Wins and Variables")
 ```
 
-Looking at the matrix plot, we will consider removing the following favirables because of multicollinearity: `svpt`, `firsstIn`, `firsttWon`, `secondndWon`, `SvGms`, and `bpFaced`.
+Looking at the matrix plot, we will consider removing the following variables because of multicollinearity: `svpt`, `firsstIn`, `firsttWon`, `secondndWon`, `SvGms`, and `bpFaced`.
 
-We will now look at box plots of the numeric variables we will include in our full model:
+We will now look at the box plots of the numeric variables that we will include in our full model:
 
 ```{r fig.height=10, fig.width=8, message=FALSE}
 p1 <- ggplot(data=ten,aes(x=status,y=minutes, group=status)) +
@@ -266,6 +266,8 @@ model.selected.interactions <- step(full_w_interactions,direction="backward")
 
 # Model
 
+Below, we have used the results from the backwards selection method and created a new model, `final.base.model`.
+
 ```{r}
 final.base.model <- model.selected.interactions
 kable(tidy(final.base.model), format = "markdown", digits = 3)
@@ -274,6 +276,14 @@ kable(tidy(final.base.model), format = "markdown", digits = 3)
 # Model Assessment
 
 ## Binned Residual Plots 
+
+We will further our investigation of whether our new model follows the key model assessment characteristics:
+
+- Good binned residual vs. predicted plot
+
+- Good binned residual vs. numerical explanatory plots
+
+- Large area under the ROC curve
 
 ```{r}
 ten <- ten %>% mutate(Residuals = residuals.glm(final.base.model,type="response"),
@@ -311,14 +321,8 @@ ROC.ten <- roc(ten$status,ten$Predicted,plot=T)
 ROC.ten$auc
 ```
 
-```{r}
-threshold = 0.30
-table(ten$status, ten$Predicted > threshold)
-```
+Because our binned residual vs. `bpSaved` plot looks rough, we will decide to remove the variable.
 
-```{r}
-(326 + 13)/(26+13+326+635)
-```
 # Influential Points 
 
 ## VIF
@@ -331,7 +335,7 @@ After looking at the VIF values, we see that the VIF for `surface` is greater th
 
 # Linear Regression Assumptions: Version 2 
 
-This is our revised final model. We will use this model to conduct predictions and our analysis. The assumptions are in a separate Rmd file. 
+This is our revised final model, after removing `surface` and `bpSaved`. We will use this model to conduct predictions and our analysis. The assumptions are in a separate Rmd file. 
 
 ```{r}
 newten <- ten
@@ -343,7 +347,7 @@ kable(tidy(final), format = "markdown", digits = 6)
 
 ## Test cases: 
 
-We will look at a match that was played the Monte Carlo Masters in 2014 between Roger Federer and Novak Djokovic. We want to see the probability that a player will win the match. 
+We will look at a match that was played at the Monte Carlo Masters in 2014 between Roger Federer and Novak Djokovic. We want to see the probability that either player will win the match. 
 
 ```{r message=FALSE}
 tennis %>%
@@ -376,9 +380,9 @@ c(predffed, lowerfed, upperfed)
 c(predfdjo1, lowerdjo1, upperdjo1)
 ```
 
-The model predicts that Roger Federer has a 79.37% chance of winning the match, and we are 95% confident that the probability of Federer winning the match is between 74.74% and 84.00%. The model predicts that Novak Djokovic has a 92.52% chance of winning the match, and we are 95% confident that the probability of Djokovic winning the match is between 87.16% and 96.49%. 
+The model predicts that Roger Federer has a 79.37% chance of winning the match, and we are 95% confident that the probability of Federer winning the match is between 74.74% and 84.00%. The model also predicts that Novak Djokovic has a 92.52% chance of winning the match, and we are 95% confident that the probability of Djokovic winning the match is between 87.16% and 96.49%. 
 
-This is mainly because Djokovic's rank points were almost double that of Federer's at the time. However, Federer won the match. In this case, we had an anomaly. 
+Given the model, Djokovic won. This is mainly because Djokovic's rank points were almost double that of Federer's at the time. However, Federer won the match. In this case, we had an anomaly. 
 
 ### Test Case with Similar Rank Points 
 
@@ -424,7 +428,7 @@ The model predicts that Tsonga has a higher probability of winning the match, an
 
 In general, if both players have similar statistics, the model does a good job of predicting which player will win the match based off who has the higher probability of winning. If the players have a certain statistic that is significantly different, especially rank points, the model will predict that the player with higher rank points has a higher probability of winning. 
 
-This indicates one of the flaws of our model; one player having a higher probability of winning does not mean that player won, as we saw with the first prediction example. Federer and Djokovic are both exceptional players, and most matches between the two are toss-ups. The easiest way to improve our predictions and their corresponding confidence intervals would be to include all 11,037 observations. This would decrease the standard error of the confidence intervals, and create a smaller and more precise interval. 
+This indicates one of the flaws of our model; one player having a higher probability of winning does not mean that player won, as we saw with the first prediction example. Federer and Djokovic are both exceptional players, and most matches between the two are toss-ups. The easiest way to improve our predictions and their corresponding confidence intervals would be to run the simulation multiple times with different seeds (which determines the random selection process for selecting the 1000 observations) and determine which model coefficients do the best at predicting the probability of winning the match.
 
 
 
