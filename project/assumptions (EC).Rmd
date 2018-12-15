@@ -205,6 +205,13 @@ ROC.newten <- roc(newten$status,newten$Predicted,plot=T)
 ROC.newten$auc
 ```
 
+```{r}
+threshold = 0.3
+table(newten$status, newten$Predicted > threshold)
+
+(326+13)/(26+326+13+635)
+```
+
 # Influential Points 
 
 ```{r}
